@@ -1,0 +1,1381 @@
+#game {
+    position: relative;
+    border: 1px solid black;
+    width: 640px;
+    height: 480px;
+    background-color: #9FB2CC;
+    margin: 0 auto;
+    overflow: hidden;
+
+}
+#title {
+    position: absolute;
+    top: 60px;
+    width: 100%;
+    font-family: courier;
+    z-index: 1;
+}
+#title span {
+    display: block;
+    font-size: 76px;
+    margin-top: 40px;
+    text-align: center;
+    font-weight: bold;
+    text-shadow: 1px 1px white;
+}
+#title ul {
+    width: 200px;
+    margin: 0 auto;
+    list-style: none;
+    text-align: center;
+    text-shadow: 1px 1px white;
+    font-size: 24px;
+}
+#title li:hover {
+    font-weight: bold;
+    cursor: pointer;
+}
+#title table {
+    margin: 10px 0px 0px 40px;
+}
+#title td {
+    padding-right: 20px;
+}
+#title div {
+    position: absolute;
+    top: 400px;
+    font-family: courier;
+    opacity: 0.7;
+    font-size: 11px;
+    text-align: center;
+    text-shadow: 2px 2px #999;
+}
+#level {
+    position: relative;
+    height: 800px;
+}
+#game.collision {
+    border: 1px solid red;
+}
+#background {
+    position: absolute;
+    width: 1200px;
+    height: 800px;
+}
+#background_colour {
+    position: absolute;
+    top: 480px;
+    width: 100%;
+    height: 100%;
+    background-color: #63875B;
+    height: 100%;
+}
+#background_image {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    height: 480px;
+    background-image: url("background.png");
+    background-size: 640px 480px;
+    background-repeat: repeat;
+}
+#mountains {
+    position: absolute;
+    width: 1200px;
+    height: 1000px;
+    background-image: url("mountains.png");
+    background-size: 200% 200%;
+}
+#player {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background-image: url('sprites/player.png');
+    background-position: 0px 0px;
+    z-index: 3;
+}
+#player:not(.weapon):not(.running):not(.attack_ready):not(.attack1):not(.attack2):not(.attack_end):not(.potion):not(.pain):not(.fadeout)  {
+    animation: 0.5s player-idle infinite step-end;
+}
+@keyframes player-idle {
+    0% {background-position: 0px 0px;}
+    33% {background-position: -64px 0px;}
+    67% {background-position: -128px 0px;}
+}
+#player.weapon:not(.running):not(.attack_ready):not(.attack1):not(.attack2):not(.attack_end):not(.potion):not(.pain):not(.fadeout) {
+    animation: 0.5s player-weapon-idle infinite step-end;
+}
+@keyframes player-weapon-idle {
+    0% {background-position: -192px 0px;}
+    33% {background-position: -256px 0px;}
+    67% {background-position: -320px 0px;}
+}
+#player.left {
+    transform: scaleX(-1);
+}
+#player.running:not(.weapon) {
+    animation: 0.4s player-running infinite step-end;
+}
+@keyframes player-running {
+    0% {background-position: 0px -64px;}
+    33% {background-position: -64px -64px;}
+    67% {background-position: -128px -64px;}
+}
+#player.weapon.running {
+    animation: 0.4s player-weapon-running infinite step-end;
+}
+@keyframes player-weapon-running {
+    0% {background-position: 0px -128px;}
+    33% {background-position: -64px -128px;}
+    67% {background-position: -128px -128px;}
+}
+#player.jumping {
+    animation: 0.4s player-jump 1 step-end;
+}
+@keyframes player-jump {
+    0% {background-position: 0px -64px;}
+    50% {background-position: -64px -64px;}
+}
+#player.falling {
+    animation: 0.4s player-falling infinite step-end;
+}
+@keyframes player-falling {
+    0% {background-position: -320px -64px;}
+    50% {background-position: -384px -64px;}
+}
+#player.attack_ready {
+    animation: 0.4s player-attackready 1 step-end;
+}
+@keyframes player-attackready {
+    0% {    background-position: 0px -192px;}
+    50% {    background-position: -64px -192px;}
+}
+#player.attack1 {
+    animation: 0.4s player-attack1 1 step-end;
+}
+@keyframes player-attack1 {
+    0% {    background-position: -128px -192px;}
+    25% {    background-position: -192px -192px;}
+    50% {    background-position: -256px -192px;}
+    75% {    background-position: -320px -192px;}
+}
+#player.attack2 {
+    animation: 0.4s player-attack2 1 step-end;
+}
+@keyframes player-attack2 {
+    0% {    background-position: 0px -256px;}
+    20% {    background-position: -64px -256px;}
+    40% {    background-position: -128px -256px;}
+    60% {    background-position: -192px -256px;}
+    80% {    background-position: -256px -256px;}
+}
+#player.attack_end {
+    animation: 0.4s player-attackready 1 reverse step-end;
+}
+#player.potion {
+    animation-name: potion;
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
+    animation: 1.5s potion infinite step-end;
+}
+@keyframes potion {
+    0% {    background-position: 0px -320px;}
+    15% {    background-position: -64px -320px;}
+    30% {    background-position: -128px -320px;}
+    45% {    background-position: -192px -320px;}
+    60% {    background-position: -256px -320px;}
+    75% {    background-position: -192px -320px;}
+    90% {    background-position: -256px -320px;}
+}
+#player.pain {
+    animation: 0.4s player-pain infinite step-end;
+}
+@keyframes player-pain {
+    0% {background-position: 0px -384px;}
+    50% {background-position: -64px -384px;}
+}
+#player.fadeout {
+    animation: 1s player-fadeout 1 step-end;
+    background-position: -320px -320px;
+}
+@keyframes player-fadeout {
+    0% {background-position: 0px -384px;}
+    8% {background-position: -64px -384px;}
+    16% {background-position: -128px -384px;}
+    24% {background-position: -192px -384px;}
+    32% {background-position: -256px -384px;}
+    40% {background-position: -320px -384px;}
+    48% {background-position: 0px -448px;}
+    56% {background-position: -64px -448px;}
+    64% {background-position: -128px -448px;}
+    72% {background-position: -192px -448px;}
+    80% {background-position: -256px -448px;}
+    90% {background-position: -320px -448px;}
+}
+#player_weapon {
+    position: absolute;
+    width: 36px;
+    height: 16px;
+    background-image: url("sprites/weapons.png");
+    display: none;
+    z-index: 4;
+}
+#player.left ~ #player_weapon {
+    transform: scaleX(-1);
+}
+#player_weapon.rifle {
+    background-position: 0px 0px;
+}
+#player_weapon.shotgun {
+    background-position: 0px -16px;
+}
+#player_weapon.flamethrower {
+    background-position: 0px -48px;
+}
+#player_weapon.laserlancer {
+    background-position: 0px -64px;
+}
+#player_weapon.chaingun {
+    background-position: 0px -96px;
+}
+#player_weapon.rocketlauncher {
+    background-position: 0px -112px;
+}
+#player.weapon.running ~ #player_weapon:not(.firing):not(.windup):not(.cooldown) {
+    animation: 0.4s weapon-running infinite step-end;
+}
+@keyframes weapon-running {
+    0% {    margin-top: 0px;}
+    25% {    margin-top: 3px;}
+    50% {    margin-top: 1px;}
+    75% {    margin-top: -1px;}
+}
+#player_weapon.rifle.firing {
+    animation: 0.2s rifle-firing infinite step-end;
+}
+@keyframes rifle-firing {
+    0% {    background-position: 0px 0px;}
+    25% {    background-position: -36px 0px;}
+    50% {    background-position: -72px -0px;}
+    75% {    background-position: -108px -0px;}
+}
+#player_weapon.shotgun.firing {
+    animation: 0.8s shotgun-firing infinite step-end;
+}
+@keyframes shotgun-firing {
+    0% {    background-position: 0px -16px;}
+    15% {    background-position: -36px -16px;}
+    30% {    background-position: -72px -16px;}
+    50% {    background-position: -108px -16px;}
+    70% {    background-position: 0px -32px;}
+    90% {    background-position: -36px -32px;}
+}
+#player_weapon.flamethrower.firing {
+    animation: 0.2s flamethrower-firing infinite step-end;
+}
+@keyframes flamethrower-firing {
+    0% {    background-position: -72px -48px;}
+    50% {    background-position: -108px -48px;}
+}
+#player_weapon.laserlancer.firing {
+    animation: 1.2s laserlancer-firing infinite step-end;
+}
+@keyframes laserlancer-firing {
+    0% {    background-position: 0px -64px;}
+    15% {    background-position: -36px -64px;}
+    30% {    background-position: -72px -64px;}
+    45% {    background-position: -108px -64px;}
+    60% {    background-position: 0px -80px;}
+    80% {    background-position: -36px -80px;}
+    90% {    background-position: -72px -80px;}
+}
+#player_weapon.chaingun.windup {
+    animation: 1s chaingun-windup infinite step-end;
+}
+@keyframes chaingun-windup {
+    0% {    background-position: 0px -96px;}
+    25% {    background-position: -36px -96px;}
+    45% {    background-position: 0px -96px;}
+    65% {    background-position: -36px -96px;}
+    75% {    background-position: 0px -96px;}
+    85% {    background-position: -36px -96px;}
+    95% {    background-position: 0px -96px;}
+}
+#player_weapon.chaingun.firing {
+    animation: 0.15s chaingun-firing infinite step-end;
+}
+@keyframes chaingun-firing {
+    0% {    background-position: -72px -96px;}
+    50% {    background-position: -108px -96px;}
+}
+#player_weapon.chaingun.cooldown {
+    animation: 1s chaingun-windup infinite reverse step-end;
+}
+#player_weapon.rocketlauncher.firing {
+    animation: 0.8s rocketlauncher-firing infinite step-end;
+}
+@keyframes rocketlauncher-firing {
+    0% {    background-position: -36px -112px;}
+    20% {    background-position: -72px -112px;}
+    40% {    background-position: -108px -112px;}
+    60% {    background-position: 0px -112px;}
+}
+.projectile {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background-image: url("sprites/projectiles.png");
+}
+.projectile.left:not(.pellet2) {
+    transform: scaleX(-1);
+}
+.bullet {
+    width: 128px;
+    height: 2px;
+    background: linear-gradient(yellow, white);
+}
+.pellet {
+    width: 128px;
+    height: 2px;
+    margin-top: 10px;
+    background: linear-gradient(yellow, white);
+}
+.pellet2:not(.left) {
+    width: 128px;
+    height: 2px;
+    margin-top: 4px;
+    background: linear-gradient(yellow, white);
+    transform: rotate(-4deg);
+}
+.pellet2.left {
+    width: 128px;
+    height: 2px;
+    margin-top: 4px;
+    background: linear-gradient(yellow, white);
+    transform: rotate(4deg);
+}
+.pellet3:not(.left) {
+    width: 128px;
+    height: 2px;
+    margin-top: 16px;
+    background: linear-gradient(yellow, white);
+    transform: rotate(4deg);
+}
+.pellet3.left {
+    width: 128px;
+    height: 2px;
+    margin-top: 16px;
+    background: linear-gradient(yellow, white);
+    transform: rotate(-4deg) !important;
+}
+.flames {
+    animation: 0.2s flames infinite step-end;
+}
+@keyframes flames {
+    0% {    background-position: 0px 0;}
+    25% {    background-position: -32px 0px;}
+    50% {    background-position: -64px 0px;}
+    75% {    background-position: -96px 0px;}
+}
+.projectile.rocket {
+    animation: 0.2s rocket infinite step-end;
+}
+@keyframes rocket {
+    0% {    background-position: 0px -32px;}
+    25% {    background-position: -32px -32px;}
+    50% {    background-position: -64px -32px;}
+    75% {    background-position: -96px -32px;}
+}
+.explosion {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/projectiles.png");
+    animation: 0.5s explosion infinite step-end;
+}
+@keyframes explosion {
+    0% {    background-position: 0px -96px;}
+    25% {    background-position: -64px -96px;}
+    50% {    background-position: 0px -160px;}
+    75% {    background-position: -64px -160px;}
+}
+.projectile.done {
+    width: 12px !important;
+}
+.laser {
+    width: 600px;
+    height: 12px;
+    background-image: url("sprites/laser.png");
+    background-size: 600px 12px;
+}
+.fireball {
+    animation: 0.2s fireball infinite step-end;
+}
+@keyframes fireball {
+    0% {    background-position: 0px -64px;}
+    25% {    background-position: -32px -64px;}
+    50% {    background-position: -64px -64px;}
+    75% {    background-position: -96px -64px;}
+}
+.flamecrawl {
+    animation: 0.2s flamecrawl infinite step-end;
+}
+@keyframes flamecrawl {
+    0% {    background-position: 0px -224px;}
+    25% {    background-position: -32px -224px;}
+    50% {    background-position: -64px -224px;}
+    75% {    background-position: -96px -224px;}
+}
+.ground {
+    position: absolute;
+    height: 64px;
+    width: 64px;
+    background-image: url("sprites/textures.png"); 
+}
+.earth-left {
+    background-position: 0px 0px;
+}
+.earth {
+    background-position: -64px 0px;
+}
+.earth-right {
+    background-position: -128px 0px;
+}
+.grass-left {
+    background-position: -192px 0px;
+}
+.grass {
+    background-position: -256px 0px;
+}
+.grass-right {
+    background-position: -320px 0px;
+}
+.earth-grass {
+    background-position: 0px -64px;
+}
+.grass-earth {
+    background-position: -64px -64px;
+}
+.stones1 {
+    background-position: -128px -64px;
+}
+.stones2 {
+    background-position: -192px -64px;
+}
+.earth-stripes {
+    background-position: -256px -64px;
+}
+.stripes-earth {
+    background-position: -320px -64px;
+}
+.metal-left {
+    background-position: 0px -128px;
+}
+.metal {
+    background-position: -64px -128px;
+}
+.metal-right {
+        background-position: -128px -128px;
+}
+.stripes-left {
+    background-position: -192px -128px;
+}
+.stripes {
+background-position: -256px -128px;
+}
+.stripes-right {
+    background-position: -320px -128px;
+}
+.metal-stripes {
+    background-position: 0px -192px;
+}
+.stripes-metal {
+    background-position: -64px -192px;
+}
+.light1 {
+    background-position: -128px -192px;
+}
+.panel {
+    background-position: -192px -192px;
+}
+.grass-metal {
+    background-position: -256px -192px;
+}
+.metal-grass {
+    background-position: -320px -192px;
+}
+.stone-left {
+    background-position: 0px -256px;
+}
+.stone {
+    background-position: -64px -256px;
+}
+.stone-right {
+    background-position: -128px -256px;
+}
+.earth-stone {
+    background-position: -192px -256px;
+}
+.stoneplants {
+    background-position: -256px -256px;
+}
+.stone-earth {
+    background-position: -320px -256px;
+}
+.elevator {
+    background-image: url("sprites/elevator.png");
+    width: 96px;
+}
+
+.solid {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/solids.png");
+}
+.solid.earth {
+    background-position: 0px 0px;
+}
+.solid.metal {
+    background-position: -64px 0px;
+}
+.solid.doorframe {
+    background-position: -128px 0px;
+}
+.solid.door {
+    background-position: -128px -64px;
+}
+
+
+.background {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+}
+.rocks-left {
+    background-image: url("sprites/rocks.png");
+    background-position: 0px 0px;
+}
+.rocks {
+    background-image: url("sprites/rocks.png");
+    background-position: -64px 0px;
+}
+.rocks-right {
+    background-image: url("sprites/rocks.png");
+    background-position: -128px 0px;
+}
+.rocks-left2 {
+    background-image: url("sprites/rocks.png");
+    background-position: 0px 0px;
+    transform: scaleY(-1);
+}
+.rock {
+    background-image: url("sprites/rock.png");
+    background-repeat: repeat;
+}
+.rocks-right2 {
+    background-image: url("sprites/rocks.png");
+    background-position: -128px 0px;
+    transform: scaleY(-1);
+}
+.rockstones {
+    background-image: url("sprites/rocks.png");
+    background-position: -256px 0px;
+}
+.steel-left {
+    background-image: url("sprites/metal.png");
+    background-position: 0px 0px;
+}
+.steel {
+    background-image: url("sprites/metal.png");
+    background-position: -64px 0px;
+}
+.steel-right {
+    background-image: url("sprites/metal.png");
+    background-position: -128px 0px;
+}
+.pipe {
+    background-image: url("sprites/metal.png");
+    background-position: -192px 0px;
+}
+
+
+.decoration {
+    position: absolute;
+    width: 64px;
+    background-image: url("sprites/decorations.png");
+}
+
+.tree {
+    height: 128px;
+    background-position: 0px 0px;
+}
+.tree2 {
+    height: 128px;
+    background-position: -64px 0px;
+}
+.tree3 {
+    height: 128px;
+    background-position: -128px 0px;
+}
+.plant {
+    height: 64px;
+    background-position: 0px -128px;
+}
+.barrel {
+    height: 64px;
+    background-position: -64px -128px;
+}
+.crate {
+    height: 64px;
+    background-position: -128px -128px;
+}
+.machine {
+    height: 64px;
+    background-position: 0px -192px;
+    animation: 0.8s machine-anim infinite step-end;
+}
+@keyframes machine-anim {
+    0% {background-position: 0px -192px;}
+    33% {background-position: -64px -192px;}
+    67% {background-position: -128px -192px;}
+}
+.machine2 {
+    height: 64px;
+    background-position: 0px -256px;
+    animation: 0.8s machine2-anim infinite step-end;
+}
+@keyframes machine2-anim {
+    0% {background-position: 0px -256px;}
+    50% {background-position: -64px -256px;}
+}
+.machine3 {
+    height: 64px;
+    background-position: -128px -256px;
+}
+
+
+
+
+
+#health_bar_border {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    background-image: url('sprites/bar_border.png');
+    width: 144px;
+    height: 17px;
+}
+#health_bar {
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    background-image: url('sprites/health_bar_inside.png');
+    background-size: 100% 17px;
+    width: 137px;
+    height: 17px;
+}
+#health_bar_end {
+    position: absolute;
+    left: 147px;
+    top: 0px;
+    background-image: url('sprites/health_bar_end.png');
+    width: 3px;
+    height: 17px;
+}
+#health_bar_back {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    background-image: url('sprites/bar_back.png');
+    width: 192px;
+    height: 17px;
+}
+#credits {
+    position: absolute;
+    box-sizing: border-box;
+    right: 10px;
+    top: 10px;
+    background-image: url('sprites/bar_border.png');
+    background-position: -144px 0px;
+    width: 48px;
+    height: 17px;
+    padding: 3px 6px 0px 0px;
+    text-align: right;
+    color: white;
+    font-family: courier;
+    font-size: 11px;
+}
+#inventory {
+    position: absolute;
+    width: 640px;
+    height: 50px;
+    top: 420px;
+}
+#boxes {
+    position: relative;
+    text-align: center;
+    width: 360px;
+    height: 42px;
+    margin: 0 auto;
+    z-index: 5;
+}
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: left;
+    width: 42px;
+    height: 42px;
+    border: 2px solid white;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 3px;
+    opacity: 0.8;
+    box-sizing: border-box;
+    background-image: url("sprites/items.png");
+    background-position: 0px 0px;
+}
+.box span {
+    margin-top: 24px;
+    display: inline;
+    float: right;
+    padding-right: 2px;
+}
+.box.medikit {
+    background-position: -75px -75px;
+    display: none;
+}
+.box.rifle {
+    background-position: -11px -11px;
+    display: none;
+}
+.box.shotgun {
+    background-position: -75px -11px;
+    display: none;
+}
+.box.flamethrower {
+    background-position: -139px -11px;
+    display: none;
+}
+.box.laserlancer {
+    background-position: -203px -11px;
+    display: none;
+}
+.box.chaingun {
+    background-position: -267px -11px;
+    display: none;
+}
+.box.rocketlauncher {
+    background-position: -331px -11px;
+    display: none;
+}
+
+#boss_bar_border {
+    position: absolute;
+    left: 240px;
+    top: 390px;
+    background-image: url('sprites/bar_border.png');
+    width: 144px;
+    height: 17px;
+    visibility: hidden;
+    transform: scaleY(1.2);
+}
+#boss_bar {
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    background-image: url('sprites/health_bar_inside.png');
+    background-size: 100% 17px;
+    width: 137px;
+    height: 17px;
+    transform: scaleY(1.2);
+}
+#boss_bar_end {
+    position: absolute;
+    left: 147px;
+    top: 0px;
+    background-image: url('sprites/health_bar_end.png');
+    width: 3px;
+    height: 17px;
+    transform: scaleY(1.2);
+}
+#boss_bar_back {
+    position: absolute;
+    left: 240px;
+    top: 390px;
+    background-image: url('sprites/bar_back.png');
+    width: 192px;
+    height: 17px;
+    visibility: hidden;
+    transform: scaleY(1.2);
+}
+
+
+
+.zarg {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/zarg.png");
+}
+.zarg:not(.running):not(.attacking):not(.pain):not(.fadeout) {
+    animation: 0.8s zarg-idle infinite step-end;
+}
+.zarg.right  {
+    transform: scaleX(-1);
+}
+@keyframes zarg-idle {
+    0% {background-position: 0px 0px;}
+    50% {background-position: -64px 0px;}
+}
+.zarg.running {
+    animation: 0.8s zarg-running infinite step-end;
+}
+@keyframes zarg-running {
+    0% {background-position: 0px -64px;}
+    20% {background-position: -64px -64px;}
+    40% {background-position: -128px -64px;}
+    60% {background-position: -192px -64px;}
+    80% {background-position: -256px -64px;}
+}
+.zarg.attacking {
+    animation: 1s zarg-attacking infinite step-end;
+}
+@keyframes zarg-attacking {
+    0% {background-position: 0px -128px;}
+    15% {background-position: -64px -128px;}
+    30% {background-position: -128px -128px;}
+    45% {background-position: -192px -128px;}
+    60% {background-position: -256px -128px;}
+    80% {background-position: -320px -128px;}
+}
+.zarg.pain {
+    animation: 0.4s zarg-pain infinite step-end;
+}
+@keyframes zarg-pain {
+    0% {background-position: -64px -192px;}
+    50% {background-position: -128px -192px;}
+}
+.zarg.fadeout {
+    animation: 1s zarg-fadeout infinite step-end;
+}
+@keyframes zarg-fadeout {
+    0% {background-position: 0px -192px;}
+    8% {background-position: -64px -192px;}
+    16% {background-position: -128px -192px;}
+    24% {background-position: -192px -192px;}
+    32% {background-position: -256px -192px;}
+    40% {background-position: -320px -192px;}
+    48% {background-position: 0px -256px;}
+    56% {background-position: -64px -256px;}
+    64% {background-position: -128px -256px;}
+    73% {background-position: -192px -256px;}
+    81% {background-position: -256px -256px;}
+    88% {background-position: -320px -256px;}
+}
+
+.urk {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/urk.png");
+}
+.urk:not(.running):not(.attacking):not(.pain):not(.fadeout) {
+    animation: 0.8s urk-idle infinite step-end;
+}
+.urk.right  {
+    transform: scaleX(-1);
+}
+@keyframes urk-idle {
+    0% {background-position: 0px 0px;}
+    50% {background-position: -64px 0px;}
+}
+.urk.running {
+    animation: 0.6s urk-running infinite step-end;
+}
+@keyframes urk-running {
+    0% {background-position: 0px -64px;}
+    25% {background-position: -64px -64px;}
+    50% {background-position: -128px -64px;}
+    75% {background-position: -192px -64px;}
+}
+.urk.attacking {
+    animation: 1s urk-attacking infinite step-end;
+}
+@keyframes urk-attacking {
+    0% {background-position: 0px -128px;}
+    20% {background-position: -64px -128px;}
+    40% {background-position: -128px -128px;}
+    60% {background-position: -192px -128px;}
+    80% {background-position: -256px -128px;}
+    90% {background-position: -320px -128px;}
+}
+.urk.pain {
+    animation: 0.4s urk-pain infinite step-end;
+}
+@keyframes urk-pain {
+    0% {background-position: -64px -192px;}
+    50% {background-position: -128px -192px;}
+}
+.urk.fadeout {
+    animation: 1s zarg-fadeout infinite step-end;
+}
+
+
+.szardig {
+    position: absolute;
+    width: 96px;
+    height: 64px;
+    background-image: url("sprites/szardig.png");
+}
+.szardig:not(.running):not(.attacking):not(.attacking2):not(.pain):not(.fadeout) {
+    animation: 0.8s szardig-idle infinite step-end;
+}
+.szardig.right  {
+    transform: scaleX(-1);
+}
+@keyframes szardig-idle {
+    0% {background-position: 0px 0px;}
+    33% {background-position: -96px 0px;}
+    67% {background-position: -192px 0px;}
+}
+.szardig.running {
+    animation: 0.6s szardig-running infinite step-end;
+}
+@keyframes szardig-running {
+    0% {background-position: 0px -64px;}
+    20% {background-position: -96px -64px;}
+    40% {background-position: -192px -64px;}
+    60% {background-position: -288px -64px;}
+    80% {background-position: -384px -64px;}
+}
+.szardig.attacking {
+    animation: 1s szardig-attacking infinite step-end;
+}
+@keyframes szardig-attacking {
+    0% {background-position: 0px -128px;}
+    25% {background-position: -96px -128px;}
+    50% {background-position: -192px -128px;}
+    75% {background-position: -288px -128px;}
+}
+.szardig.attacking2 {
+    animation: 1s szardig-attacking2 infinite step-end;
+}
+@keyframes szardig-attacking2 {
+    0% {background-position: 0px -192px;}
+    20% {background-position: -96px -192px;}
+    40% {background-position: -192px -192px;}
+    60% {background-position: -288px -192px;}
+    80% {background-position: -384px -192px;}
+}
+.szardig.pain {
+    animation: 0.4s szardig-pain infinite step-end;
+}
+@keyframes szardig-pain {
+    0% {background-position: 0px -256px;}
+    50% {background-position: -96px -256px;}
+}
+.szardig.fadeout {
+    animation: 1.2s szardig-fadeout infinite step-end;
+}
+@keyframes szardig-fadeout {
+    0% {background-position: 0px -256px;}
+    10% {background-position: -96px -256px;}
+    20% {background-position: -192px -256px;}
+    30% {background-position: -288px -256px;}
+    40% {background-position: -384px -256px;}
+    50% {background-position: 0px -320px;}
+    60% {background-position: -96px -320px;}
+    70% {background-position: -192px -320px;}
+    80% {background-position: -288px -320px;}
+    90% {background-position: -384px -320px;}
+}
+.bladecrawler {
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    background-image: url("sprites/bladecrawler.png");
+}
+.bladecrawler:not(.running):not(.attacking):not(.pain):not(.fadeout) {
+    animation: 0.8s bladecrawler-idle infinite step-end;
+}
+.bladecrawler.right  {
+    transform: scaleX(1);
+}
+.bladecrawler:not(.right)  {
+    transform: scaleX(-1);
+}
+@keyframes bladecrawler-idle {
+    0% {background-position: 0px 0px;}
+    33% {background-position: -128px 0px;}
+    67% {background-position: -256px 0px;}
+}
+.bladecrawler.running {
+    animation: 0.8s bladecrawler-running infinite step-end;
+}
+@keyframes bladecrawler-running {
+    0% {background-position: 0px -128px;}
+    20% {background-position: -128px -128px;}
+    40% {background-position: -256px -128px;}
+    60% {background-position: -384px -128px;}
+    80% {background-position: -512px -128px;}
+}
+.bladecrawler.attacking {
+    animation: 1s bladecrawler-attacking infinite step-end;
+}
+@keyframes bladecrawler-attacking {
+    0% {background-position: 0px -256px;}
+    20% {background-position: -128px -256px;}
+    40% {background-position: -256px -256px;}
+    60% {background-position: -384px -256px;}
+    80% {background-position: -512px -256px;}
+}
+.bladecrawler.pain {
+    animation: 0.4s bladecrawler-pain infinite step-end;
+}
+@keyframes bladecrawler-pain {
+    0% {background-position: 0px -384px;}
+    50% {background-position: -128px -384px;}
+}
+.bladecrawler.fadeout {
+    animation: 1s bladecrawler-fadeout infinite step-end;
+}
+@keyframes bladecrawler-fadeout {
+    0% {background-position: 0px -384px;}
+    8% {background-position: -128px -384px;}
+    16% {background-position: -256px -384px;}
+    24% {background-position: -384px -384px;}
+    32% {background-position: -512px -384px;}
+    40% {background-position: 0px -512px;}
+    48% {background-position: -128px -512px;}
+    56% {background-position: -256px -512px;}
+    64% {background-position: -384px -512px;}
+    73% {background-position: -512px -512px;}
+    81% {background-position: 0px -640px;}
+}
+
+.mortiguard {
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    background-image: url("sprites/mortiguard.png");
+}
+.mortiguard:not(.running):not(.attacking):not(.firing):not(.pain):not(.fadeout) {
+    animation: 0.8s mortiguard-idle infinite step-end;
+}
+.mortiguard.right  {
+    transform: scaleX(1);
+}
+.mortiguard:not(.right)  {
+    transform: scaleX(-1);
+}
+@keyframes mortiguard-idle {
+    0% {background-position: 0px 0px;}
+    50% {background-position: -128px 0px;}
+}
+.mortiguard.running {
+    animation: 0.8s mortiguard-running infinite step-end;
+}
+@keyframes mortiguard-running {
+    0% {background-position: 0px -128px;}
+    20% {background-position: -128px -128px;}
+    40% {background-position: -256px -128px;}
+    60% {background-position: -384px -128px;}
+    80% {background-position: -512px -128px;}
+}
+.mortiguard.attacking {
+    animation: 1s mortiguard-attacking infinite step-end;
+}
+@keyframes mortiguard-attacking {
+    0% {background-position: 0px -256px;}
+    20% {background-position: -128px -256px;}
+    40% {background-position: -256px -256px;}
+    60% {background-position: -384px -256px;}
+    80% {background-position: -512px -256px;}
+}
+.mortiguard.firing {
+    animation: 0.3s mortiguard-firing infinite step-end;
+}
+@keyframes mortiguard-firing {
+    40% {background-position: -256px 0px;}
+    60% {background-position: -384px 0px;}
+    80% {background-position: -512px 0px;}
+}
+.mortiguard.pain {
+    animation: 0.4s mortiguard-pain infinite step-end;
+}
+@keyframes mortiguard-pain {
+    0% {background-position: 0px -384px;}
+    50% {background-position: -128px -384px;}
+}
+.mortiguard.fadeout {
+    animation: 1s mortiguard-fadeout infinite step-end;
+}
+@keyframes mortiguard-fadeout {
+    0% {background-position: 0px -384px;}
+    8% {background-position: -128px -384px;}
+    16% {background-position: -256px -384px;}
+    24% {background-position: -384px -384px;}
+    32% {background-position: -512px -384px;}
+    40% {background-position: 0px -512px;}
+    48% {background-position: -128px -512px;}
+    56% {background-position: -256px -512px;}
+    64% {background-position: -384px -512px;}
+    73% {background-position: -512px -512px;}
+    81% {background-position: 0px -640px;}
+}
+.zogarch {
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    background-image: url("sprites/zogarch.png");
+}
+.zogarch:not(.running):not(.attacking):not(.pain):not(.fadeout) {
+    animation: 0.8s zogarch-idle infinite step-end;
+}
+.zogarch.right  {
+    transform: scaleX(-1);
+}
+@keyframes zogarch-idle {
+    0% {background-position: 0px 0px;}
+    33% {background-position: -128px 0px;}
+    67% {background-position: -256px 0px;}
+}
+.zogarch.running {
+    animation: 0.8s zogarch-running infinite step-end;
+}
+@keyframes zogarch-running {
+    0% {background-position: 0px -128px;}
+    25% {background-position: -128px -128px;}
+    50% {background-position: -256px -128px;}
+    75% {background-position: -384px -128px;}
+}
+.zogarch.attacking {
+    animation: 1s zogarch-attacking infinite step-end;
+}
+@keyframes zogarch-attacking {
+    0% {background-position: 0px -256px;}
+    25% {background-position: -128px -256px;}
+    50% {background-position: -256px -256px;}
+    75% {background-position: -384px -256px;}
+}
+.zogarch.pain {
+    animation: 0.4s zogarch-pain infinite step-end;
+}
+@keyframes zogarch-pain {
+    0% {background-position: 0px -384px;}
+}
+.zogarch.fadeout {
+    animation: 1s zogarch-fadeout infinite step-end;
+}
+@keyframes zogarch-fadeout {
+    0% {background-position: 0px -384px;}
+    8% {background-position: -128px -384px;}
+    16% {background-position: -256px -384px;}
+    24% {background-position: -384px -384px;}
+    32% {background-position: -512px -384px;}
+    40% {background-position: 0px -512px;}
+    48% {background-position: -128px -512px;}
+    56% {background-position: -256px -512px;}
+    64% {background-position: -384px -512px;}
+    73% {background-position: -512px -512px;}
+    81% {background-position: 0px -640px;}
+    90% {background-position: -128px -640px;}
+}
+
+
+
+.orb {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/zarg.png");
+    background-position: 0px -320px;
+}
+.bladecrawler_orb, .mortiguard_orb, .zogarch_orb {
+    margin-top: 64px;
+}
+.pickup {
+    position: absolute;
+}
+.pickup.weapon {
+    padding: 8px 0px 8px 0px;
+    width: 36px;
+    height: 16px;
+    background-clip: content-box;
+/*    animation: 2s itembob infinite;   */
+}
+.pickup.rifle {
+    background-image: url("sprites/weapons.png");
+    background-position: 0px +8px;
+}
+.pickup.shotgun {
+    background-image: url("sprites/weapons.png");
+    background-position: 0px -8px;
+}
+.pickup.flamethrower {
+    background-image: url("sprites/weapons.png");
+    background-position: 0px -40px;
+}
+.pickup.laserlancer {
+    background-image: url("sprites/weapons.png");
+    background-position: 0px -56px;
+}
+.pickup.chaingun {
+    background-image: url("sprites/weapons.png");
+    background-position: 0px -88px;
+}
+.pickup.rocketlauncher {
+    background-image: url("sprites/weapons.png");
+    background-position: 0px -104px;
+}
+@keyframes itembob {
+    0% {margin-top: 0px;}
+    15% {margin-top: -1px;}
+    30% {margin-top: -2px;}
+    50% {margin-top: -4px; opacity: 0.7;}
+    65% {margin-top: -2px;}
+    80% {margin-top: -1px;}
+}
+.pickup.ammo {
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/items.png");
+    background-position: 0px -64px;
+}
+.pickup.medikit {
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/items.png");
+    background-position: -64px -64px;
+}
+.pickup.rebreather {
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/items.png");
+    background-position: 0px -128px;
+}
+.pickup.powersource {
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/items.png");
+    background-position: -64px -128px;
+}
+.pickup.jumpboots {
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/items.png");
+    background-position: -128px -128px;
+}
+.pickup.translator {
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/items.png");
+    background-position: -192px -128px;
+}
+#helmet {
+    position: absolute;
+    top: 200px;
+    left: 200px;
+    width: 64px;
+    height: 64px;
+    background-image: url("sprites/player.png");
+    background-position: -320px -320px;
+}
+.next, .previous {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background-color: black;
+    display: none;
+}
+#store {
+    position: absolute;
+    margin: 10%;
+    width: 80%;
+    height: 70%;
+    background-color: rgb(113, 113, 238);
+    border: 5px solid rgb(222, 222, 255);
+    border-top-left-radius: 17px;
+    border-bottom-right-radius: 17px;
+    padding: 20px;
+    opacity: 0.85;
+    box-sizing: border-box;
+    display: none;
+    z-index: 5;
+}
+#store div {
+    position: relative;
+    float: left;
+    width: 200px;
+    height: 60px;
+    border: 2px solid white;
+    margin: 8px 0px 0px 8px;
+    cursor: pointer;
+    font-family: courier;
+    font-weight: bold;
+    padding: 4px;
+    box-sizing: border-box;
+}
+#store div span {
+    color: #333;
+}
+#store div:hover {
+    background-color: #999;
+}
+#store li {
+    position: absolute;
+    left: 24px;
+    top: 12px;
+    width: 90px;
+    height: 50px;
+    background-image: url("sprites/weapons.png");
+    background-size: 400% 700%;
+    list-style: none;
+}
+#rifle li {
+    background-position: 0px 0px;
+}
+#shotgun li {
+    background-position: 0px -38px;
+}
+#flamethrower li {
+    background-position: 0px -130px;
+}
+#laserlancer li {
+    background-position: 0px -170px;
+}
+#chaingun li {
+    background-position: 0px -258px;
+}
+#rocketlauncher li {
+    background-position: 0px -300px;
+}
+#store div span {
+    float: right;
+}
+.prompt {
+    position: absolute;
+    top: 300px;
+    left: 260px;
+    margin: 0 auto;
+    font-family: courier;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 5;
+}
+.prompt span {
+    display: inline-block;
+    border: 1px solid #555;
+    background-color: #333;
+    color: white;
+    width: 22px;
+    padding: 4px;
+    text-align: center;
+}
+
+#door_prompt, #elevator_prompt, #vendor_prompt {
+    display: none;
+}

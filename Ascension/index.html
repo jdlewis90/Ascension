@@ -1,0 +1,2520 @@
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Jamie's Pixel Art Game</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+
+    <div id="title">
+        <span>Ascension</span>
+        <ul>
+            <li id="start" class="selected">Start Game</li>
+
+            <table><tr><td>A D</td><td>Run</td></tr>
+                <tr><td>W</td><td>Jump</td></tr>
+                <tr><td>F</td><td>Fire</td></tr>
+                <tr><td>E<td>Melee</td></tr>
+                <tr><td>Q</td><td>Medikit</td></tr>
+                </table>
+            <div>A game by Jamie Lewis &copy; 2018</div>
+        </ul>
+    </div>
+    
+    <div id="game">
+            <div id="store">
+                    <h2>Weapon Store</h2>
+                    <div id="rifle">Rifle<li></li><span>70</span></div>
+                    <div id="shotgun">Shotgun<li></li><span>200</span></div>
+                    <div id="flamethrower">Flamethrower<li></li><span>120</span></div>
+                    <div id="laserlancer">Laser Lancer<li></li><span>500</span></div>
+                    <div id="chaingun">Chaingun<li></li><span>400</span></div>
+                    <div id="rocketlauncher">Rocket Launcher<li></li><span>500</span></div>
+                </div>
+        <div id="game_field">
+            <div id="background">
+                <div id="background_image"></div>
+                <div id="background_colour"></div>
+            </div>
+            <div id="mountains"></div>
+            <div id="player"></div>
+            <div id="player_weapon"></div>
+            <div id="level"></div>
+        </div>
+        <div id="hud">
+            <div id="health_bar_back">
+                <div id="health_bar"></div>
+                <div id="health_bar_end"></div>
+            </div>
+            <div id="health_bar_border"></div>
+            <div id="boss_bar_back">
+                <div id="boss_bar"></div>
+                <div id="boss_bar_end"></div>
+            </div>
+            <div id="boss_bar_border"></div>
+            <div id="credits"></div>
+            <div id="inventory">
+                <div id="boxes">
+                    <div id="inv_medikit" class="box medikit">Q<span id="medikits">1</span></div>
+                    <div id="inv_rifle" class="box rifle">1<span id="bullets">30</span></div>
+                    <div id="inv_shotgun" class="box shotgun">2<span id="shells">8</span></div>
+                    <div id="inv_flamethrower" class="box flamethrower">3<span id="fuel">50</span></div>
+                    <div id="inv_laserlancer" class="box laserlancer">4<span id="charges">4</span></div>
+                    <div id="inv_chaingun" class="box chaingun">5<span id="rounds">60</span></div>
+                    <div id="inv_rocketlauncher" class="box rocketlauncher">6<span id="rockets">3</span></div>
+                </div>
+            </div>
+        </div>
+        <div id="door_prompt" class="prompt"><span>X</span> door</div>
+        <div id="elevator_prompt" class="prompt"><span>X</span>  elevator</div>
+        <div id="vendor_prompt" class="prompt"><span>X</span>  vendor</div>
+    </div>
+
+
+<script>
+
+    menu = 0;
+    document.getElementById("game_field").style.display="none";
+    document.getElementById("hud").style.display="none";
+
+    document.getElementById("start").onclick = begin;
+
+    window.player = document.getElementById("player");
+    window.level=0;
+    window.attacking = 0;
+    window.firing = 0;
+    window.charging = 0;
+    window.jumping = 0;
+    window.collision = false;
+    window.platform = 0;
+    window.attack_timer;
+    window.enemy_attack_timer;
+    window.weapon = 0;
+    window.health = 100;
+    window.weapons = [];
+    window.ammo = [0,0,0,0,0,0,0,0];
+    window.double = 0;
+    window.epress = 0;
+    window.textures = [];
+    window.helmet = "none";
+
+    function begin() {
+    document.getElementById("game_field").style.display="block";
+    document.getElementById("hud").style.display="block";
+    document.getElementById("title").style.display="none";
+    start_game();
+    }
+
+    function start_game() {
+
+    window.collision = false;
+    window.platform = 0;
+    window.attack_timer;
+    window.enemy_attack_timer;
+
+//Intro
+if (window.level==0) {
+        window.player_left = 128;
+        window.player_top = 50;
+        window.offset = [0,0];
+        window.width = 400;
+
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+    window.platforms = [{left:-64, height:316, tex: "grass-left, grass, grass, grass, grass, grass, grass-right"},
+                    {left:312, height:420, tex: "earth-left, earth, earth, earth-grass, grass, grass-right"},
+                    {left:750, height:420, tex: "earth-left, earth, earth, earth, earth, earth-right"},
+                     ];
+
+window.solids = [                 
+
+];
+
+window.backgrounds = [
+
+
+                    {left:-32, height:350, tex: "rocks, rock, rock, rocks-right2"},
+                    {left:-64, height:414, tex: "rocks, rock, rock, rocks, rocks-right2"},
+                    {left:-32, height:478, tex: "rocks, rock, rock, rocks, rocks-right2"},
+                    {left:286, height:478, tex: "rocks-left2, rocks, rocks, rocks-right"},
+                    {left:0, height:542, tex: "rocks, rocks, rocks, rocks, rocks, rocks, rocks, rocks-right"},
+                    {left:0, height:606, tex: "rocks, rocks, rocks, rocks, rocks, rocks, rocks, rocks-right2"},
+                    {left:-32, height:670, tex: "rocks, rocks, rocks, rocks, rocks, rocks, rocks, rocks, rocks-right2"},
+                    {left:0, height:734, tex: "rocks, rocks, rocks, rocks, rocks, rocks, rocks, rocks, rocks-right2"},
+                    {left:-1, height:758, tex: "rock"},
+
+                    {left:832, height:450, tex: "rocks-left, rock, rock, rocks-right2"},
+                    {left:864, height:514, tex: "rocks-left, rock, rock, rocks, rocks-right2"},
+                    {left:896, height:578, tex: "rocks-left, rock, rock, rocks, rocks-right2"},
+                    {left:896, height:642, tex: "rocks-left2, rock, rock, rocks, rocks-right2"},
+                    {left:864, height:706, tex: "rocks-left2, rock, rock, rocks, rocks-right2"},
+    ];
+
+window.decorations = [{type:"tree", platform:2, pos: 228},
+
+                        ];
+
+window.enemies = [
+
+
+    ];
+
+window.pickups = [
+                    {type:"next", x: 1035, y: 340},
+                    
+    ];
+
+}
+
+//Fields
+if (window.level>=1 && window.level<2) {
+    window.width = 400;
+    if (window.level==1) {
+        window.player_left = 128;
+        window.player_top = 50;
+        window.offset = [0,0];
+    }
+    if (window.level==1.5) {
+        window.player_left = 530;
+        window.player_top = 240;
+        window.offset = [window.width,0];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+    window.platforms = [{left:128, height:216, tex: "grass-left, grass, grass, grass-right"},
+                    {left:214, height:326, tex: "earth-left, earth-grass, grass-right"},
+                    {left:8, height:395, tex: "earth-left, earth, earth-right"},
+                    {left:440, height:256, tex: "grass-left, grass-earth, earth-right"},
+                    {left: 540, height: 300, tex: "earth-left, stones1, earth, earth, earth, earth, earth, earth, earth-right"},
+
+                    ];
+
+window.solids = [                 
+
+];
+
+window.backgrounds = [{left:128, height:276, tex: "rocks-left, rocks-right"},
+                    {left:186, height:384, tex: "rocks-left, rocks-right"},
+                    {left:218, height:438, tex: "rocks"},
+                    {left:186, height:502, tex: "rocks-left2, rocks-right2"},
+                    {left:154, height:566, tex: "rocks-left2, rocks, rocks-right2"},
+                    {left:122, height:630, tex: "rocks-left2, rocks, rocks, rocks-right2"},
+                    {left:90, height:694, tex: "rocks-left2, rocks, rocks, rocks, rocks-right2"},
+
+                    {left:32, height:694, tex: "rocks-left2, rocks-right"},
+
+                    {left:420, height:310, tex: "rocks-left, rocks, rocks, rocks, rocks-right"},
+                    {left:452, height:374, tex: "rocks-left, rocks, rocks, rocks-right"},
+                    {left:484, height:438, tex: "rocks-left, rocks, rocks-right"},
+                    {left:484, height:502, tex: "rocks-left2, rocks, rocks-right2"},
+                    {left:452, height:566, tex: "rocks-left2, rocks, rockstones, rocks-right2"},
+                    {left:420, height:630, tex: "rocks-left2, rocks, rocks, rocks, rocks-right2"},
+                    {left:388, height:694, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks-right2"},
+
+                    {left:-1, height:758, tex: "rock"},
+
+    ];
+
+window.decorations = [{type:"tree", platform:4, pos: 28},
+                        {type:"tree3", platform:4, pos: 96},
+                        ];
+
+window.enemies = [
+                    {type:"zarg", platform:4, pos: 140},
+                    {type:"zarg", platform:5, pos: 200},
+                    {type:"urk", platform:5, pos: 320},
+    ];
+
+window.pickups = [{type:"rifle", x: 200, y: 180},
+                    {type:"medikit", x: 48, y: 358},
+                    {type:"next", x: 1040, y: 300},
+                    
+    ];
+
+}
+//Bridge
+if (window.level>=2 && window.level<3) {
+    window.width = 700;
+    if (window.level==2) {
+        window.player_left = 80;
+        window.player_top = 254;
+        window.offset = [0,0];
+    }
+    if (window.level==2.5) {
+        window.player_left = 530;
+        window.player_top = 332;
+        window.offset = [window.width,40];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 322, tex: "earth-left, earth, earth, earth-grass, grass, grass-right"},
+                    {left: 440, height: 372, tex: "grass-left, grass, grass, grass, grass, grass-metal, metal, metal-grass , grass-right"},
+                    {left: 1000, height: 434, tex: "earth-left, earth, stones1, earth-grass, grass, grass-right"},
+                    {left: 260, height: 460, tex: "earth-left, earth, earth, earth-right"},
+                    {left: 130, height: 560, tex: "earth-left, stones1, earth-right"},
+                    {left: 380, height: 660, tex: "earth-left, earth, earth, earth-right"},
+                    {left: 710, height: 660, tex: "earth-left, earth, earth-right"},
+                    {left: 840, height: 550, tex: "earth-left, earth, earth-right"},
+                    ];
+
+window.solids = [                
+
+];
+
+window.backgrounds = [
+{left:100, height:360, tex: "rocks-left, rocks, rocks-right"},
+{left:132, height:424, tex: "rocks-left, rocks-right"},
+{left:132, height:488, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks-right"},
+{left:100, height:552, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks-right"},
+{left:100, height:616, tex: "rocks-left, rocks, rocks, rocks, rocks, rocks-right2"},
+{left:418, height:424, tex: "rocks-left2, rocks-right"},
+
+{left:866, height:434, tex: "rocks-left, rocks, rocks, rocks, rocks, rocks-right"},
+{left:866, height:496, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks-right"},
+{left:834, height:560, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks-right"},
+{left:802, height:624, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks-right"},
+{left:-1, height:680, tex: "rock"},
+    ];
+
+window.decorations = [{type:"tree2", platform:3, pos: 275},
+                        ];
+
+window.enemies = [{type:"zarg", platform:2, pos:260},
+                    {type:"urk", platform:2, pos:390},
+                    {type:"zarg", platform:3, pos:220},
+                    {type:"urk", platform:6, pos:200},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 300},
+                    {type:"ammo", x: 165, y: 520},
+                    {type:"next", x: 1300, y: 380},
+    ];
+
+}
+//Woods
+if (window.level>=3 && window.level<4) {
+    window.width = 700;
+    if (window.level==3) {
+        window.player_left = 80;
+        window.player_top = 254;
+        window.offset = [0,0];
+    }
+    if (window.level==3.5) {
+        window.player_left = 550;
+        window.player_top = 352;
+        window.offset = [window.width,40];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 322, tex: "earth-left, earth-grass, grass, grass-right"},
+                    {left: 400, height: 400, tex: "grass-left, grass, grass, grass-right"},
+                    {left: 200, height: 480, tex: "earth-left, earth-grass, grass-right"},
+                    {left: 680, height: 380, tex: "grass-left, grass, grass-right"},
+                    {left: 940, height: 380, tex: "grass-left, grass, grass, grass-earth, earth-right"},
+                    {left: 1060, height: 510, tex: "earth-left, earth, earth, earth, earth, earth-right"},
+                    ];
+
+window.solids = [                
+
+];
+
+window.backgrounds = [
+{left:0, height:360, tex: "rocks-left, rocks, rocks-right2"},
+{left:32, height:424, tex: "rocks-left, rocks, rocks-right2"},
+{left:32, height:488, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks, rocks-right"},
+{left:0, height:552, tex: "rocks-left2, rockstones, rocks, rocks, rocks, rocks, rocks-right"},
+{left:0, height:616, tex: "rocks-left, rocks, rocks, rocks, rocks, rocks, rocks-right2"},
+{left:318, height:424, tex: "rocks-left2, rocks, rocks-right"},
+
+{left:646, height:434, tex: "rocks-left, rocks, rocks, rocks, rocks, rocks, rocks-right2"},
+{left:646, height:496, tex: "rocks-left2, rocks, rockstones, rocks, rocks, rocks, rocks-right"},
+{left:614, height:560, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks, rocks, rocks-right"},
+{left:582, height:624, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks, rocks, rocks-right"},
+{left:-1, height:680, tex: "rock"},
+    ];
+
+window.decorations = [
+                        {type:"tree", platform:3, pos: 120},
+                        {type:"tree3", platform:2, pos: 125},
+                        {type:"tree3", platform:2, pos: 195},
+                        {type:"tree3", platform:5, pos: 69},
+                        ];
+
+window.enemies = [{type:"zarg", platform:2, pos:200},
+                    {type:"zarg", platform:4, pos:150},
+                    {type:"zarg", platform:6, pos:220},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 300},
+                    {type:"ammo", x: 145, y: 440},
+                    {type:"medikit", x: 1040, y: 476},
+                    {type:"next", x: 1340, y: 480},
+    ];
+
+}
+//Outpost
+if (window.level>=4 && window.level<5) {
+    window.width = 900;
+    if (window.level==4) {
+        window.player_left = 80;
+        window.player_top = 254;
+        window.offset = [0,0];
+    }
+    if (window.level==4.5) {
+        window.player_left = 530;
+        window.player_top = 270;
+        window.offset = [window.width,0];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 322, tex: "earth-left, earth, earth-grass, grass-right"},
+                    {left: 192, height: 420, tex: "earth-left, earth, earth-stripes, stripes, stripes-right"},
+                    {left: 500, height: 420, tex: "stripes-left, stripes-metal, metal, metal, metal, metal, metal, metal-stripes, stripes-right"},
+                    {left: 1090, height: 420, tex: "stripes-left, stripes-metal, metal, metal, metal-stripes, stripes-right"},
+                    {left: 1500, height: 370, tex: "earth-left, earth, stones1, earth, earth, earth"},
+
+                    {left: 700, height: 200, tex: "stripes-left, stripes-metal, metal, metal, metal, metal-stripes, stripes-right"},
+                    {left: 1140, height: 320, tex: "metal-left, metal, metal-right"},
+
+                    {left: 756, height: 20, tex: "metal-left, metal, metal, metal, metal, metal, metal, metal, metal metal-right"},
+
+                    {left: 800, height: 580, tex: "stripes-left, stripes-metal, metal, metal, metal, metal, metal-right"},
+                    {left: 720, height: 680, tex: "earth-left, earth, earth, stones2, earth-right"},
+                    {left: 830, height: 810, tex: "earth-left, earth, earth, stones1, earth, earth-right"},
+
+                    {left: 128, height: 1000, tex: "earth-left, stones2, earth, earth, stones1, earth, earth, earth, earth, earth, earth, earth-right"},
+
+                    {left: 440, height: 530, tex: "earth-left, earth, earth, earth-stripes, stripes-right"},
+                    {left: 0, height: 580, tex: "earth-left, earth, earth, earth, stones2, earth, earth, earth-right"},
+                    {left: 740, height: 900, tex: "earth-left, earth-right"},
+                    ];
+
+window.solids = [
+                {left:700, top: 230, height: 128, tex: "metal"},
+                 {left:700, top: 358, height: 3, tex: "doorframe"},
+                 {left:700, top: 358, height: 64, tex: "door"},
+                 {left:1200, top: 20, height: 340, tex: "metal"},
+                 {left:1200, top: 358, height: 3, tex: "doorframe"},
+                 {left:1200, top: 358, height: 64, tex: "door"},
+
+                 {left:700, top: 40, height: 100, tex: "metal"},
+
+                {left:1090, top: 460, height: 128, tex: "metal"},
+
+                {left:640, top: 460, height: 220, tex: "metal"},
+
+                {left:766, top: 840, height: 160, tex: "earth"},   
+
+                {left:380, top: 540, height: 40, tex: "earth"},
+];
+
+window.backgrounds = [
+
+{left:-1, height:580, tex: "rock"},
+    ];
+
+window.decorations = [
+        {type:"machine2", platform:3, pos: 360},
+                        ];
+
+window.enemies = [
+                    {type:"zarg", platform:2, pos:260},
+                    {type:"urk", platform:3, pos:390},
+                    {type:"zarg", platform:3, pos:220},
+                    {type:"zarg", platform:6, pos:220},
+                    {type:"urk", platform:11, pos:290},
+                    {type:"bladecrawler", platform:12, pos: 100},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 300},
+                    {type:"flamethrower", x: 680, y: 160},
+                    {type:"ammo", x: 820, y: 540},
+                    {type:"medikit", x: 600, y: 495},
+                    {type:"next", x: 1500, y: 320},
+    ];
+}
+//Cliffs
+if (window.level>=5 && window.level<6) {
+    window.width = 850;
+    if (window.level==5) {
+        window.player_left = 80;
+        window.player_top = 320;
+        window.offset = [0,40];
+    }
+    if (window.level==5.5) {
+        window.player_left = 530;
+        window.player_top = 290;
+        window.offset = [window.width,100];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 422, tex: "earth-left, earth, earth-grass, grass-right"},
+                    {left: 150, height: 580, tex: "grass-left, grass, grass, grass-right"},
+                    {left: 200, height: 720, tex: "earth-left, earth, earth-stone, stone-earth, earth-right"},
+                    {left: 600, height: 700, tex: "earth-left, earth, stones1, earth-right"},
+                    {left: 800, height: 620, tex: "earth-left, earth-right"},
+                    {left: 900, height: 510, tex: "earth-left, earth-right"},
+                    {left: 815, height: 810, tex: "earth-left, earth, stones2, earth earth-right"},
+                    {left: 680, height: 930, tex: "earth-left, earth, earth-right"},
+                    {left: 820, height: 1050, tex: "earth-left, earth-right"},
+                    {left: 1060, height: 470, tex: "grass-left, grass, grass-right"},
+                    {left: 1250, height: 450, tex: "grass-left, grass, grass, grass-earth, earth-grass, grass-right"},
+                    ];
+
+window.solids = [
+];
+
+window.backgrounds = [
+        {left:20, height:480, tex: "rocks-left, rocks, rocks-right2"},
+        {left:52, height:544, tex: "rocks-left, rocks, rocks-right2"},
+
+            {left:390, height:480, tex: "rocks-left2, rocks-right2"},
+            {left:358, height:544, tex: "rocks-left2, rocks, rocks-right2"},
+
+            {left:880, height:480, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks-right2"},
+            {left:848, height:544, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks, rocks-right2"},
+{left:-1, height:580, tex: "rock"},
+    ];
+
+window.decorations = [
+    {type:"tree2", platform:10, pos: 96},
+    {type:"tree", platform:11, pos: 71},
+                        ];
+
+window.enemies = [
+                {type:"zarg", platform:3, pos:220},
+                {type:"zarg", platform:4, pos:110},
+                {type:"urk", platform:7, pos:210},
+                {type:"zarg", platform:10, pos:70},
+                {type:"urk", platform:11, pos:260},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 360},
+                    {type:"shotgun", x: 805, y: 1000},
+                    {type:"next", x: 1440, y: 400},
+    ];
+
+}
+//Descent
+if (window.level>=6 && window.level<7) {
+    window.width = 700;
+    if (window.level==6) {
+        window.player_left = 80;
+        window.player_top = 320;
+        window.offset = [0,60];
+    }
+    if (window.level==6.5) {
+        window.player_left = 530;
+        window.player_top = 370;
+        window.offset = [window.width,400];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 442, tex: "earth-left, earth, earth-grass, grass, grass-right"},
+                    {left: 370, height: 500, tex: "grass-left, grass, grass, grass-right"},
+                    {left: 640, height: 540, tex: "grass-left, grass, grass-earth, earth-stone, stone-earth, earth-grass, grass-right"},
+                    {left: 870, height: 700, tex: "earth-left, earth, earth, earth-right"},
+                    {left: 530, height: 770, tex: "earth-left, earth, earth-right"},
+                    {left: 360, height: 870, tex: "earth-left, earth, earth-right"},
+                    {left: 720, height: 830, tex: "earth-left, earth, stones2, earth-right"},
+                    {left: 900, height: 830, tex: "earth-left, stones1, earth, earth-stone, stone, stone-earth, earth, earth, earth-right"},
+                    ];
+
+window.solids = [
+];
+
+window.backgrounds = [
+        {left:20, height:480, tex: "rocks-left, rocks, rocks-right"},
+        {left:52, height:544, tex: "rocks-left, rocks-right"},
+
+            {left:358, height:544, tex: "rocks-left2, rockstones, rocks, rocks-right2"},
+
+            {left:880, height:480, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks-right2"},
+            {left:848, height:544, tex: "rocks-left2, rocks, rocks, rocks, rocks, rocks, rocks-right2"},
+            {left:-1, height:580, tex: "rock"},
+    ];
+
+window.decorations = [
+    {type:"tree2", platform:1, pos: 220},
+                        ];
+
+window.enemies = [
+                {type:"zarg", platform:2, pos:220},
+                {type:"urk", platform:3, pos:220},
+                {type:"urk", platform:3, pos:280},
+                {type:"zarg", platform:8, pos:120},
+
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 390},
+                    {type:"ammo", x: 380, y: 834},
+                    {type:"next", x: 1280, y: 790},
+    ];
+
+}
+//Caves
+if (window.level>=7 && window.level<8) {
+    window.width = 900;
+    if (window.level==7) {
+        window.player_left = 60;
+        window.player_top = 320;
+        window.offset = [0,80];
+    }
+    if (window.level==7.5) {
+        window.player_left = 530;
+        window.player_top = 270;
+        window.offset = [window.width,0];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 462, tex: "earth-left, earth, stones2, earth-right"},
+                    {left: 64, height: 572, tex: "earth-left, earth, earth, earth-right"},
+                    {left: 400, height: 340, tex: "earth-left, stones1, earth, earth-right"},
+                    {left: 350, height: 460, tex: "earth-left, earth, earth, earth-right"},
+                    {left: 500, height: 580, tex: "earth-left, earth, stones2, earth-stone, stone, stone-right"},
+                    {left: 800, height: 445, tex: "stone-left, stone, stone-right"},        
+                    {left: 900, height: 325, tex: "earth-left, earth, earth, stones1, earth-right"},
+                    {left: 1140, height: 655, tex: "stone-left, stone-earth, earth, earth, earth-right"},
+                    {left: 960, height: 785, tex: "stone-left, stone, stone-right"},
+                    {left: 490, height: 904, tex: "stone-left, stone, stone, stoneplants, stone, stone-earth, earth, earth-right"},
+                    {left: 1220, height: 490, tex: "earth-left, earth, earth, stones1, earth, earth, earth-right"},
+                    ];
+
+window.solids = [
+{left:380, top: 345, height: 120, tex: "earth"},
+{left:420, top: 465, height: 120, tex: "earth"},
+{left:640, top: 40, height: 450, tex: "earth"},
+];
+
+window.backgrounds = [
+{left:-1, height:0, tex: "rock"},
+{left:-1, height:600, tex: "rock"},
+    ];
+
+window.decorations = [
+                        ];
+
+window.enemies = [
+                {type:"zarg", platform:2, pos:220},
+                {type:"szardig", platform:5, pos:290},
+                {type:"szardig", platform:10, pos:420},
+                {type:"zarg", platform:7, pos:180},
+                {type:"zarg", platform:6, pos:160},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 400},
+                    {type:"ammo", x: 30, y: 540},
+                    {type:"next", x: 1500, y: 440},
+                    {type:"ammo", x: 510, y: 870},
+    ];
+
+}
+//Deep Caves
+if (window.level>=8 && window.level<9) {
+    window.width = 920;
+    if (window.level==8) {
+        window.player_left = 80;
+        window.player_top = 220;
+        window.offset = [0,180];
+    }
+    if (window.level==8.5) {
+        window.player_left = 530;
+        window.player_top = 160;
+        window.offset = [window.width,0];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 470, tex: "earth-left, earth, earth, earth-right"},
+                    {left: 200, height: 580, tex: "earth-left, earth, earth, stones2, earth, earth-right"},
+                    {left: 500, height: 440, tex: "earth-left, earth, earth, earth-right"},
+                    {left: 720, height: 320, tex: "earth-left, earth-stone, stone, stone-right"},
+                    {left: 940, height: 640, tex: "stone-left, stone-earth, earth-stone, stone-earth, earth-right"},
+                    {left: 0, height: 720, tex: "stone-left, stone-earth, earth, earth, earth-stone, stone, stone-earth, earth, earth, stones1, earth, earth-right"},
+                    {left: 800, height: 860, tex: "earth-left, earth, earth, earth-right"},
+                    {left: 120, height: 940, tex: "stone-left, stone, stone-earth, earth-stone, stone, stone, stone-earth, earth, earth, stones2, earth-right"},
+                    {left: 1100, height: 540, tex: "earth-left, earth, stones2, earth-right"},
+                    {left: 1180, height: 380, tex: "earth-left, earth, earth-right"},
+                    {left: 1300, height: 240, tex: "earth-left, stones1, stones2, earth, earth, earth-right"},
+                    ];
+
+window.solids = [
+{left:460, top: 450, height: 130, tex: "earth"},
+];
+
+window.backgrounds = [
+{left:-1, height:0, tex: "rock"},
+{left:-1, height:600, tex: "rock"},
+    ];
+
+window.decorations = [
+                        ];
+
+window.enemies = [
+                {type:"urk", platform:2, pos:220},
+                {type:"urk", platform:4, pos:170},
+                {type:"szardig", platform:6, pos:400},
+                {type:"zarg", platform:4, pos:160},
+                {type:"mortiguard", platform:8, pos:140},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 360},
+                    {type:"medikit", x: 900, y: 830},
+                    {type:"rifle", x: 600, y: 680},
+                    {type:"next", x: 1500, y: 210},
+    ];
+
+}
+//Base Entrance
+if (window.level>=9 && window.level<10) {
+    window.width = 1000;
+    if (window.level==9) {
+        window.player_left = 80;
+        window.player_top = 200;
+        window.offset = [0,280];
+    }
+    if (window.level==9.5) {
+        window.player_left = 530;
+        window.player_top = 320;
+        window.offset = [window.width,40];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 570, tex: "earth-left, earth, stones1, earth, earth-right"},
+                    {left: 360, height: 590, tex: "earth-left, earth, earth-right"},
+                    {left: 400, height: 480, tex: "earth-left, stones2, earth-right"},
+                    {left: 600, height: 460, tex: "earth-left, earth, earth-stripes, stripes, stripes-earth, earth-right"},
+                    {left: 990, height: 420, tex: "stripes-left, stripes-metal, metal-right"},
+                    {left: 1190, height: 420, tex: "stripes-left, stripes-metal, metal, metal, metal, panel, metal, metal, metal-right"},
+                    {left: 1290, height: 400, tex: "elevator"},
+                    {left: 990, height: 180, tex: "stripes-left, stripes-metal, metal, metal-stripes, stripes-right"},
+                    {left: 760, height: 160, tex: "stripes-left, stripes-metal, metal-stripes, stripes-right"},
+                    {left: 1400, height: 180, tex: "stripes-left, stripes, stripes, stripes-right"},
+                    ];
+
+window.solids = [
+];
+
+window.backgrounds = [
+{left:-1, height:500, tex: "rock"},
+    ];
+
+window.decorations = [
+                        ];
+
+window.enemies = [
+                {type:"urk", platform:2, pos:150},
+                {type:"zarg", platform:4, pos:150},
+                {type:"zarg", platform:4, pos:220},
+                {type:"szardig", platform:6, pos:290},
+                {type:"urk", platform:10, pos:180},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 540},
+                    {type:"medikit", x: 800, y: 120},
+                    {type:"ammo", x: 400, y: 440},
+                    {type:"next", x: 1600, y: 380},
+    ];
+
+}
+//Base
+if (window.level>=10 && window.level<11) {
+    window.width = 900;
+    if (window.level==10) {
+        window.player_left = 80;
+        window.player_top = 220;
+        window.offset = [0,0];
+    }
+    if (window.level==10.5) {
+        window.player_left = 530;
+        window.player_top = 220;
+        window.offset = [window.width,100];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 290, tex: "metal, metal, metal, metal-stripes, stripes-right"},
+                    {left: 400, height: 290, tex: "stripes-left, stripes-metal, metal, light1, metal, metal-stripes, stripes-right"},
+                    {left: 900, height: 320, tex: "metal-left, metal, light1, metal, light1, metal, metal-right"},
+                    {left: 200, height: 410, tex: "stripes-left, stripes, stripes, stripes, stripes, stripes, stripes-right"},
+                    {left: 110, height: 562, tex: "stripes-left, stripes-right"},
+                    {left: 0, height: 580, tex: "metal-left, metal, metal, metal, metal, metal, metal-right"},
+                    {left: 500, height: 580, tex: "stripes-left, stripes-metal, metal, panel, metal, metal, metal-right"},
+                    {left: 1310, height: 522, tex: "stripes-left, stripes-right"},
+                    {left: 1000, height: 540, tex: "stripes-left, stripes, stripes, stripes-metal, metal, metal, metal, metal-right"},
+                    {left: 1420, height: 390, tex: "stripes-left, stripes, stripes, metal-right"},
+                    {left: 200, height: 830, tex: "stripes-left, metal, metal, metal, metal, metal, stripes-right"},
+                    {left: 610, height: 850, tex: "stripes-left, metal, metal, stripes-right"},
+                    {left: 426, height: 800, tex: "elevator"},
+                    {left: 620, height: 10, tex: "metal-left, metal, metal, metal, metal, metal, metal, metal, metal, metal, metal-right"},
+                    ];
+
+window.solids = [
+                {left:580, top: 30, height: 196, tex: "metal"},
+                {left:580, top: 226, height: 3, tex: "doorframe"},
+                 {left:580, top: 226, height: 64, tex: "door"},
+                {left:1200, top: 30, height: 300, tex: "metal"},
+];
+
+window.backgrounds = [
+{left:-1, height:500, tex: "rock"},
+    ];
+
+window.decorations = [
+        {type:"machine3", platform:3, pos: 54},
+        {type:"machine", platform:9, pos: 92},
+        {type:"crate", platform:12, pos: 54},
+        {type:"crate", platform:12, pos: 86},
+                        ];
+
+window.enemies = [
+            {type:"urk", platform:2, pos:290},
+            {type:"szardig", platform:3, pos:290},
+            {type:"szardig", platform:6, pos:320},
+            {type:"szardig", platform:12, pos:180},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 230},
+                    {type:"ammo", x: 1030, y: 286},
+                    {type:"chaingun", x: 700, y: 810},
+                    {type:"next", x: 1490, y: 330},
+    ];
+}
+//Dig
+if (window.level>=11 && window.level<12) {
+    window.width = 950;
+    if (window.level==11) {
+        window.player_left = 60;
+        window.player_top = 260;
+        window.offset = [0,20];
+    }
+    if (window.level==11.5) {
+        window.player_left = 530;
+        window.player_top = 260;
+        window.offset = [window.width,470];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 360, tex: "metal, metal, metal, metal-stripes, stripes, stripes, stripes-right"},
+                    {left: 430, height: 390, tex: "stripes-left, stripes-metal, metal-grass, grass, grass-right"},
+                    {left: 790, height: 390, tex: "grass-left, grass-metal, metal, metal, metal, metal, metal, metal, metal-right"},
+                    {left: 930, height: 220, tex: "metal-left, metal, metal, metal, metal, metal-right"},
+                    {left: 1030, height: 500, tex: "earth-left, earth, earth, earth, earth-grass, grass, grass-right"},
+                    {left: 780, height: 620, tex: "earth-left, earth, earth, earth, earth-right"},
+                    {left: 600, height: 740, tex: "earth-left, earth, earth-right"},
+                    {left: 600, height: 740, tex: "earth-left, earth, earth-stone, stone-earth, earth-right"},
+                    {left: 830, height: 850, tex: "stone-left, stone, stone-earth, earth-stone, stone-right"},
+                    {left: 1180, height: 820, tex: "earth-left, earth, earth-stone, stone stone-right"},
+                    {left: 1410, height: 280, tex: "earth-left, earth, earth, earth, earth, earth, earth-right"},
+                    {left: 1460, height: 800, tex: "stone-left, stone, stone-earth, earth-stone, stone-right"},   
+                    ];
+
+window.solids = [
+                {left:220, top: 30, height: 268, tex: "metal"},
+                {left:220, top: 298, height: 3, tex: "doorframe"},
+                 {left:220, top: 298, height: 64, tex: "door"},
+                {left:900, top: 240, height: 60, tex: "metal"},
+                {left:1140, top: 240, height: 60, tex: "metal"},
+                {left:1350, top: 300, height: 206, tex: "earth"},
+                {left:980, top: 540, height: 82, tex: "earth"},
+];
+
+window.backgrounds = [
+{left:-1, height:540, tex: "rock"},
+    ];
+
+window.decorations = [
+        {type:"crate", platform:1, pos: 86},
+        {type:"barrel", platform:3, pos: 120},
+        {type:"crate", platform:3, pos: 230},
+        {type:"machine2", platform:3, pos: 300},
+        {type:"barrel", platform:6, pos: 50},
+        {type:"barrel", platform:6, pos: 80},
+                        ];
+
+window.enemies = [
+            {type:"urk", platform:1, pos:290},
+            {type:"szardig", platform:9, pos:240},
+            {type:"urk", platform:10, pos:100},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 340},
+                    {type:"ammo", x: 1510, y: 240},
+                    {type:"next", x: 1560, y: 780},
+    ];
+}
+//Ruins
+if (window.level>=12 && window.level<13) {
+    window.width = 800;
+    if (window.level==12) {
+        window.player_left = 60;
+        window.player_top = 280;
+        window.offset = [0,155];
+    }
+    if (window.level==12.5) {
+        window.player_left = 530;
+        window.player_top = 280;
+        window.offset = [window.width,260];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: 0, height: 500, tex: "earth, earth, earth-stone, stone, stone, stone-right"},
+                    {left: 400, height: 400, tex: "stone-left, stone-earth, earth-stone, stone, stone-right"},
+                    {left: 300, height: 280, tex: "earth, earth, earth-right"},
+                    {left: 550, height: 160, tex: "earth-left, earth, earth-right"},
+                    {left: 490, height: 590, tex: "stone-left, stone, stone, stone-right"},
+                    {left: 820, height: 610, tex: "stone-left, stone, stoneplants, stone-right"},
+                    {left: 720, height: 750, tex: "stone-left, stoneplants, stone-earth, earth-right"},
+                    {left: 570, height: 900, tex: "stone-left, stone-earth, stones2, earth, earth-right"},
+                    {left: 1170, height: 600, tex: "stone-left, stone, stoneplants, stone, stone,  stone-right"},
+                    ];
+
+window.solids = [
+                {left:220, top: 0, height: 328, tex: "earth"},
+
+];
+
+window.backgrounds = [
+        {left:-1, height:0, tex: "rock"},
+        {left:-1, height:540, tex: "rock"},
+    ];
+
+window.decorations = [
+        {type:"crate", platform:1, pos: 86},
+
+                        ];
+
+window.enemies = [
+            {type:"urk", platform:1, pos:290},
+            {type:"urk", platform:4, pos:120},
+            {type:"szardig", platform:5, pos:160},
+            {type:"zarg", platform:6, pos:80},
+            {type:"zarg", platform:9, pos:200},
+            {type:"zarg", platform:9, pos:300}, 
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 440},
+                    {type:"medikit", x: 550, y: 120},
+                    {type:"ammo", x: 560, y: 850},
+                    {type:"next", x: 1410, y: 570},
+    ];
+}
+//Tower
+if (window.level>=13 && window.level<14) {
+    window.width = 800;
+    if (window.level==13) {
+        window.player_left = 60;
+        window.player_top = 300;
+        window.offset = [0,332];
+    }
+    if (window.level==13.5) {
+        window.player_left = 530;
+        window.player_top = 340;
+        window.offset = [window.width,330];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: -40, height: 700, tex: "earth, earth, earth-stone, stone, stoneplants, stone, stone-right"},
+                    {left: 470, height: 600, tex: "earth-left, earth"},
+                    {left: 430, height: 780, tex: "earth-left, earth, earth, earth, earth-right"},
+                    {left: 230, height: 920, tex: "stone-left, stone, stone-right"},
+                    {left: 490, height: 950, tex: "earth-left, earth"},
+
+                    {left: 300, height: 530, tex: "stone-left, stone-right"},
+                    {left: 110, height: 470, tex: "stone-left, stoneplants, stone-right"},
+                    {left: 320, height: 350, tex: "stone-left, stone-earth, earth-stone, stone, stone, stone-earth, earth-right"},
+                    {left: 420, height: 186, tex: "earth-left, earth, earth, stones1, earth-right"},
+                    {left: 780, height: 760, tex: "earth-left, earth, earth, stones1, earth-right"},
+                    {left: 460, height: 1040, tex: "earth-left, earth, stones1, earth-stone, stone-right"},
+
+                    {left: 1180, height: 730, tex: "stone-left, stone, stone, stone, stone-right"},
+                    ];
+
+window.solids = [
+                {left:500, top: 200, height: 780, tex: "earth"},
+                {left:520, top: 200, height: 780, tex: "earth"},
+
+];
+
+window.backgrounds = [
+        {left:-1, height:0, tex: "rock"},
+        {left:-1, height:540, tex: "rock"},
+    ];
+
+window.decorations = [
+
+                        ];
+
+window.enemies = [
+            {type:"urk", platform:2, pos:60},
+            {type:"zarg", platform:3, pos:90},
+            {type:"urk", platform:11, pos:160},
+            {type:"szardig", platform:9, pos:200},
+            {type:"urk", platform:10, pos:180},
+            {type:"zarg", platform:10, pos:220},
+            {type:"szardig", platform:12, pos:200},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 640},
+                    {type:"shotgun", x: 520, y: 140},
+                    {type:"ammo", x: 460, y: 920},
+                    {type:"medikit", x: 560, y: 320},
+                    {type:"next", x: 1410, y: 660},
+    ];
+}
+//Aerna
+if (window.level>=14 && window.level<15) {
+    window.width = 700;
+    if (window.level==14) {
+        window.player_left = 60;
+        window.player_top = 300;
+        window.offset = [0,332];
+    }
+    if (window.level==14.5) {
+        window.player_left = 530;
+        window.player_top = 320;
+        window.offset = [window.width,300];
+    }
+    player.style.left = player_left + "px";
+    player.style.top = player_top + "px";
+
+
+window.platforms = [{left: -40, height: 700, tex: "earth, earth, earth-stone, stone, stoneplants, stone, stone-right"},
+                    {left: 500, height: 340, tex: "earth-left, earth, earth-right"},
+                    {left: 480, height: 700, tex: "earth-left, earth, earth-stone, stone, stoneplants, stone, stone, stone-earth, earth-stone, stone, stone, stoneplants, stone-earth, stones2, earth, earth-right"},
+
+                    ];
+
+window.solids = [
+                {left:500, top: 400, height: 220, tex: "earth"},
+
+];
+
+window.backgrounds = [
+        {left:-1, height:704, tex: "rock"},
+    ];
+
+window.decorations = [
+
+                        ];
+
+window.enemies = [
+        {type:"zogarch", platform:3, pos:700},
+    ];
+
+window.pickups = [{type:"previous", x: 0, y: 640}
+    ];
+}
+
+   //Set up backgrounds - before platforms, so they go behind
+   for (i=0; i<backgrounds.length; i++) {
+        textures[i] = backgrounds[i].tex.split(", ");
+        let newLeftBackground = document.createElement('div');
+        newLeftBackground.id = "background" + (i+1) + "left";
+        newLeftBackground.className = "background" + " " + textures[i][0];
+        document.getElementById("level").appendChild(newLeftBackground);
+
+        for (t=0; t<textures[i].length-2; t++) {
+            let newCentreBackground = document.createElement('div');
+            newCentreBackground.id = "background" + (i+1) + "centre" + (t+1);
+            newCentreBackground.className = "background" + " " + textures[i][t+1];
+            document.getElementById("level").appendChild(newCentreBackground);
+        }
+
+        let newRightBackground = document.createElement('div');
+        newRightBackground.id = "background" + (i+1) + "right";
+        newRightBackground.className = "background" + " " + textures[i][textures[i].length-1];
+        document.getElementById("level").appendChild(newRightBackground);
+    }
+
+    //Dynamically create platforms based on the numbers in the above array
+    for (i=0; i<platforms.length; i++) {
+        textures[i] = platforms[i].tex.split(", ");
+        let newLeftGround = document.createElement('div');
+        newLeftGround.id = "ground" + (i+1) + "left";
+        newLeftGround.className = "ground" + " " + textures[i][0];
+        document.getElementById("level").appendChild(newLeftGround);
+        if (platforms[i].tex=="elevator") {platforms[i].raised=0;}
+        else {
+
+        for (t=0; t<textures[i].length-2; t++) {
+            let newCentreGround = document.createElement('div');
+            newCentreGround.id = "ground" + (i+1) + "centre" + (t+1);
+            newCentreGround.className = "ground" + " " + textures[i][t+1];
+            document.getElementById("level").appendChild(newCentreGround);
+        }
+
+        let newRightGround = document.createElement('div');
+        newRightGround.id = "ground" + (i+1) + "right";
+        newRightGround.className = "ground" + " " + textures[i][textures[i].length-1];
+        document.getElementById("level").appendChild(newRightGround);
+        }
+    }
+
+    //Dynamically set the platforms to the correct positon and size based on the above array
+    for (i=0; i<platforms.length; i++) {
+        document.getElementById("ground" + (i+1) + "left").style.left=platforms[i].left-64 + "px";
+        document.getElementById("ground" + (i+1) + "left").style.top=platforms[i].height + "px";
+
+        if (platforms[i].tex!="elevator") {
+        textures[i] = platforms[i].tex.split(", ");
+
+        for (t=0; t<textures[i].length-2; t++) {
+            document.getElementById("ground" + (i+1) + "centre" + (t+1)).style.left=platforms[i].left+(t*64) + "px";
+            document.getElementById("ground" + (i+1) + "centre" + (t+1)).style.top=platforms[i].height + "px";
+        }
+
+        document.getElementById("ground" + (i+1) + "right").style.left=platforms[i].left+((textures[i].length-2)*64) + "px";
+        document.getElementById("ground" + (i+1) + "right").style.top=platforms[i].height + "px";
+        }
+    }
+
+    //set up decorations
+    for (i=0; i<decorations.length; i++) {
+        let newDecoration = document.createElement('div');
+        newDecoration.id = decorations[i].type + (i+1);
+        newDecoration.className = "decoration " + decorations[i].type;
+        document.getElementById("level").appendChild(newDecoration);
+    }
+
+    for (i=0; i<decorations.length; i++) {
+        let  left_pos = parseInt(document.getElementById("ground" + decorations[i].platform + "left").style.left)+decorations[i].pos;
+        let top_pos = (parseInt(document.getElementById("ground" + decorations[i].platform + "left").style.top)-document.getElementById(decorations[i].type + (i+1)).clientHeight+4);
+        document.getElementById(decorations[i].type + (i+1)).style.left=left_pos + "px";
+        document.getElementById(decorations[i].type + (i+1)).style.top=top_pos + "px";
+    }
+
+    //Dynamically set the backgrounds to the correct positon and size based on the above array
+    for (i=0; i<backgrounds.length; i++) {
+        document.getElementById("background" + (i+1) + "left").style.left=backgrounds[i].left + "px";
+        document.getElementById("background" + (i+1) + "left").style.top=backgrounds[i].height + "px";
+
+        textures[i] = backgrounds[i].tex.split(", ");
+
+        for (t=0; t<textures[i].length-2; t++) {
+            document.getElementById("background" + (i+1) + "centre" + (t+1)).style.left=backgrounds[i].left+((t+1)*64) + "px";
+            document.getElementById("background" + (i+1) + "centre" + (t+1)).style.top=backgrounds[i].height + "px";
+        }
+
+        document.getElementById("background" + (i+1) + "right").style.left=backgrounds[i].left+((textures[i].length-1)*64) + "px";
+        document.getElementById("background" + (i+1) + "right").style.top=backgrounds[i].height + "px";
+
+        if (backgrounds[i].left==-1) {
+            document.getElementById("background" + (i+1) + "left").style.width="1600px";
+            document.getElementById("background" + (i+1) + "left").style.height="600px";
+        }
+    }
+
+
+    
+    //set up solids
+    for (i=0; i<solids.length; i++) {
+        let newSolid = document.createElement('div');
+        newSolid.id = solids[i].tex + (i+1);
+        newSolid.className = "solid" + " " + solids[i].tex;
+        newSolid.style.left = solids[i].left + "px";
+        newSolid.style.top = solids[i].top + "px";
+        newSolid.style.height = solids[i].height + "px";
+        if (solids[i].tex=="door") {solids[i].open=0;}
+        document.getElementById("level").appendChild(newSolid);
+    }
+
+    //create enemies dynamically
+    for (e=0; e<enemies.length; e++) {
+        let newEnemy = document.createElement('div');
+        newEnemy.id = enemies[e].type + (e+1);
+        newEnemy.className = "enemy" + " " + enemies[e].type;
+        newEnemy.style.left = parseInt(document.getElementById("ground" + enemies[e].platform + "left").style.left)+enemies[e].pos;
+        newEnemy.style.top = platforms[enemies[e].platform-1].height-58;
+        if (enemies[e].type=="bladecrawler") {newEnemy.style.top = platforms[enemies[e].platform-1].height-116;}
+        if (enemies[e].type=="mortiguard") {newEnemy.style.top = platforms[enemies[e].platform-1].height-116;}
+        if (enemies[e].type=="zogarch") {newEnemy.style.top = platforms[enemies[e].platform-1].height-124;}
+        document.getElementById("level").appendChild(newEnemy);
+        enemies[e].active=0;
+        enemies[e].attack=0;
+        if (enemies[e].type=="zarg") {enemies[e].health=60; enemies[e].strength=12; enemies[e].speed=0.3;}
+        if (enemies[e].type=="urk") {enemies[e].health=90; enemies[e].strength=17; enemies[e].speed=0.5;}
+        if (enemies[e].type=="szardig") {enemies[e].health=130; enemies[e].strength=21; enemies[e].speed=0.6;}
+        if (enemies[e].type=="bladecrawler") {enemies[e].health=700; enemies[e].strength=29; enemies[e].speed=0.6;
+        document.getElementById("bladecrawler6").classList.add("right");}
+        if (enemies[e].type=="mortiguard") {enemies[e].health=900; enemies[e].strength=31; enemies[e].speed=0.4;
+        document.getElementById("mortiguard5").classList.add("right");}
+        if (enemies[e].type=="zogarch") {enemies[e].health=1200; enemies[e].strength=32; enemies[e].speed=0.5;}
+    }
+
+    //create item pickups
+    for (i=0; i<pickups.length; i++) {
+        let newPickup = document.createElement('div');
+        newPickup.className = "pickup" + " " + pickups[i].type;
+        newPickup.style.left = pickups[i].x + "px";
+        newPickup.style.top = pickups[i].y + "px";
+        document.getElementById("level").appendChild(newPickup);
+        if (pickups[i].type!="ammo") {newPickup.classList.add("weapon");}
+    }
+    if (window.helmet!="none" && window.level==window.helmet[2] && !document.getElementById("helmet")) {
+        let helmet = document.createElement("div");
+        helmet.id = "helmet";
+        helmet.style.left = window.helmet[0];
+        helmet.style.top = window.helmet[1];
+        document.getElementById("level").appendChild(helmet);
+    }
+
+
+
+        document.getElementById("background").style.left=-(offset[0]/2);
+        document.getElementById("player").classList.add("running");
+        update();
+        document.getElementById("player").classList.remove("running");
+        window.time = setInterval(update, 60/1000);
+}
+
+	document.onkeydown=keyDown;
+    document.onkeyup=keyUp;
+
+function keyDown(e) {
+        document.getElementById("store").style.display="none";
+
+		if (String.fromCharCode(e.keyCode)=="D" && attacking==0) {
+            player.classList.add("running");
+            player.classList.remove("left");
+        }
+		if (String.fromCharCode(e.keyCode)=="A" && attacking==0) {
+			player.classList.add("running", "left");
+        }
+        if (String.fromCharCode(e.keyCode)=="W") {
+            if (attacking==0 && jumping==0) {
+                player.classList.add("jumping");
+                jumping = 50;
+            }
+            if (jumping<0 && window.double==0 && weapons[7]==1) {
+                window.double=1;
+                player.classList.remove("jumping");
+                player.classList.add("falling");
+                jumping=40;
+            }
+        }
+        if (String.fromCharCode(e.keyCode)=="E" && health>0 && window.epress==0) {
+            if (attacking==0) {
+                if (weapon>0) {document.getElementById("player_weapon").style.display="none";}
+                attacking = 1;
+                document.getElementById("player").classList.remove("running");
+                document.getElementById("player").classList.add("attack_ready");
+                attack_timer = setTimeout(attack_function, 400);
+            } else if (document.getElementById("player").classList.contains("attack1") && attacking==1) {
+                attacking=2;
+            } else if (document.getElementById("player").classList.contains("attack2") && attacking==3) {
+                attacking=4;
+            }
+            window.epress=1;
+        }
+        if (String.fromCharCode(e.keyCode)=="S") {
+            if (attacking==0 && jumping==0) {
+                player.classList.remove("running");
+                player.classList.add("guard");
+                attacking=-1;
+            }
+        }
+        if (String.fromCharCode(e.keyCode)=="1" && weapons[0]==1 && attacking==0 && firing==0) {
+            weapon = 1;
+            set_weapon();
+        }
+        if (String.fromCharCode(e.keyCode)=="2" && weapons[1]==1  && attacking==0 && firing==0) {
+            weapon = 2;
+            set_weapon();
+        }
+        if (String.fromCharCode(e.keyCode)=="3" && weapons[2]==1  && attacking==0 && firing==0) {
+            weapon = 3;
+            set_weapon();
+        }
+        if (String.fromCharCode(e.keyCode)=="4" && weapons[3]==1  && attacking==0 && firing==0) {
+            weapon = 4;
+            set_weapon();
+        }
+        if (String.fromCharCode(e.keyCode)=="5" && weapons[4]==1  && attacking==0 && firing==0) {
+            weapon = 5;
+            set_weapon();
+        }
+        if (String.fromCharCode(e.keyCode)=="6" && weapons[5]==1  && attacking==0 && firing==0) {
+            weapon = 6;
+            set_weapon();
+        }
+        if (String.fromCharCode(e.keyCode)=="0" && attacking==0 && firing==0) {
+            weapon = 0;
+            set_weapon();
+        }
+        if (String.fromCharCode(e.keyCode)=="F" && attacking==0 && weapon>0) {
+            if (firing==0 && !document.getElementById("player").classList.contains("pain")) {
+                if (document.getElementById("player").classList.contains("left")) {dir = "left";} else {dir = "right";}
+                if (weapon==1 && ammo[0]>0) {document.getElementById("player_weapon").classList.add("firing"); firing=1; attack_timer = setTimeout(firing_function, 200); create_projectile("bullet", dir); ammo[0]-=1;}
+                if (weapon==2 && ammo[1]>0) {document.getElementById("player_weapon").classList.add("firing"); firing=1; attack_timer = setTimeout(firing_function, 800); create_projectile("pellet", dir);
+                    create_projectile("pellet2", dir); create_projectile("pellet3", dir); shotgun_damage();  ammo[1]-=1;}
+                if (weapon==3 && ammo[2]>0) {document.getElementById("player_weapon").classList.add("firing"); firing=1; attack_timer = setTimeout(firing_function, 100); create_projectile("flames", dir); ammo[2]-=1;}
+                if (weapon==4 && ammo[3]>0) {document.getElementById("player_weapon").classList.add("firing"); firing=1; attack_timer = setTimeout(firing_function, 1200);}
+                if (weapon==5) {document.getElementById("player_weapon").classList.add("windup"); firing=1; attack_timer = setTimeout(firing_function, 1000);} //no projectile on windup anim
+                if (weapon==6 && ammo[5]>0) {document.getElementById("player_weapon").classList.add("firing"); firing=1; attack_timer = setTimeout(firing_function, 800); create_projectile("rocket", dir); ammo[5]-=1;}
+            }
+        }
+        if (String.fromCharCode(e.keyCode)=="X") {
+			interact();
+        }
+    };
+    
+function keyUp(e) {
+        if (String.fromCharCode(e.keyCode)==" " && window.health<1) {
+                restart();
+            }
+		if (String.fromCharCode(e.keyCode)=="D") {
+            if (!player.classList.contains("left")) {
+            player.classList.remove("running", "left");
+            }
+        }
+		if (String.fromCharCode(e.keyCode)=="A") {
+            if (player.classList.contains("left")) {
+            player.classList.remove("running");
+            }
+        }
+        if (String.fromCharCode(e.keyCode)=="S") {
+            player.classList.remove("guard");
+            attacking=0;
+        }
+        if (String.fromCharCode(e.keyCode)=="E" && firing==0 && window.epress==1) {
+            window.epress=0;
+        }
+        if (String.fromCharCode(e.keyCode)=="Q" && firing==0 && attacking==0 && ammo[6]>0 && health>0) {
+            attacking=-1;
+            player.classList.remove("running");
+            player.classList.add("potion");
+            ammo[6]-=1;
+            var heal = setTimeout(function() {use_potion(60)}, 600);
+            attack_timer = setTimeout(end_attack, 1500);
+        }
+        if (String.fromCharCode(e.keyCode)=="F" && weapon>0 && health>0) {
+            if (weapon!=5 && firing==1) {firing=2;}
+            if (weapon==5) {firing=4;}
+        }
+    };
+    
+function update() {
+    if (player.classList.contains("running")) {
+        if (!player.classList.contains("left")) {
+            if (offset[0]==0) {player_left++;}
+            if (offset[0]>0 && player_left+64+offset[0]<offset[0]+400) {player_left++;}
+            //when right-hand edge is reached, increase offset[0] instead of player position, limited to width of 1400px
+            if (player_left+64+offset[0]>=offset[0]+400 && offset[0]<window.width) {offset[0]++; player_left=400-64;}
+            if (player_left+48<=640 && offset[0]>=window.width) {offset[0]=window.width; player_left++;}
+        } else {
+            if (offset[0]==0 && player_left>0-24) {player_left--;}
+            if (offset[0]>0 && player_left+offset[0]>offset[0]+240) {player_left--;}
+            //when left-hand edge is reached and offset[0]>0, reduce offset[0] instead of player position
+            if (offset[0]>0 && player_left+offset[0]<=offset[0]+240) {offset[0]--;}
+        }
+        player.style.left = player_left + "px";
+
+        document.getElementById("level").style.left=0-offset[0];
+
+    for (i=0; i<solids.length; i++) {
+
+    if (player_top+60>solids[i].top-offset[1] && player_top<solids[i].top+solids[i].height-offset[1]) {
+        if (player_left+64>solids[i].left+32-offset[0] && player_left+32<solids[i].left+36-offset[0]) {
+            if (offset[0]==0) {player_left--;}
+            if (offset[0]>0 && player_left+64<400) {player_left--;}
+            if (player_left+64>=400) {offset[0]--;}
+        }
+        if (player_left+64>solids[i].left+48-offset[0] && player_left+32<solids[i].left+52-offset[0]) {
+            if (offset[0]==0) {player_left++;}
+            if (offset[0]>0 && player_left>240) {player_left++;}
+            if (offset[0]>0 && player_left<=240) {offset[0]++;}
+        }
+    }
+}
+
+}
+
+        document.getElementById("background").style.left=-(offset[0]/4);
+        document.getElementById("mountains").style.left=-(offset[0]/2);
+
+        document.getElementById("background").style.top=-(offset[1]/4);
+        document.getElementById("mountains").style.top=-200-(offset[1]/2);
+
+//    document.getElementById("player_weapon").style.top=player_top+24;
+//    document.getElementById("player_weapon").style.left=player_left+22;
+
+   // if (player_top>300) {offset[1]++;}
+    document.getElementById("level").style.top=0-offset[1];
+
+    if (jumping>0) {    //Jump up (speed decelerates)
+        if (player_top>100) {player_top--; player_top-=1+(jumping/20);}
+        else if (offset[1]>0) {offset[1]--; offset[1]-=1+(jumping/20);}
+        else {player_top--; player_top-=1+(jumping/20);}
+
+        jumping--;
+        if (jumping==0) {jumping=-0.4};
+    }
+    if (jumping<0) {    //Once upward speed levels, start falling
+        if (collision==false) {
+            player.classList.remove("jumping");
+            player.classList.add("falling");
+            if (player_top<240) {player_top+=2;}
+            else if (player_top+offset[1]<880) {offset[1]+=2;}
+            else {player_top+=2};
+            jumping--;
+        }
+        if (collision==true) {  //If collision with ground, stop falling
+        player.classList.remove("falling");
+        jumping=0;
+        }
+    }
+
+    player.style.top = player_top + "px";
+
+    //causes falling, then tests for collision to stop falling
+    collision=false;
+    if (jumping==0) {jumping=-1;}
+    test_collision();
+
+    var projectiles = document.getElementsByClassName("projectile");
+
+    for (e=0; e<enemies.length; e++) {
+        if (!document.getElementById(enemies[e].type + (e+1)).classList.contains("orb")) {
+        var left_pos = parseInt(document.getElementById("ground" + enemies[e].platform + "left").style.left)+enemies[e].pos;
+        var top_pos = parseInt(document.getElementById(enemies[e].type + (e+1)).style.top);
+
+        enemies[e].left_boundary = ((textures[enemies[e].platform-1].length-1)*64);
+        if (platform==enemies[e].platform-1) {
+            if (player_left<left_pos-offset[0] && !document.getElementById(enemies[e].type + (e+1)).classList.contains("right")) {
+                enemies[e].active=true;
+            } else if (player_left>left_pos-offset[0] && document.getElementById(enemies[e].type + (e+1)).classList.contains("right")) {
+                enemies[e].active=true;
+            }
+        } else {
+            enemies[e].active=0;
+        }
+        
+        //player movement when active and enaging player
+        if (enemies[e].active==true && health>0) {
+            if (player_left<left_pos-offset[0]) {document.getElementById(enemies[e].type + (e+1)).classList.remove("right");}
+            if (player_left>left_pos-offset[0]) {document.getElementById(enemies[e].type + (e+1)).classList.add("right");}
+            if (!document.getElementById(enemies[e].type + (e+1)).classList.contains("attacking") && 
+            !document.getElementById(enemies[e].type + (e+1)).classList.contains("attacking2") &&
+            !document.getElementById(enemies[e].type + (e+1)).classList.contains("firing") &&
+            !document.getElementById(enemies[e].type + (e+1)).classList.contains("pain")  && 
+            !document.getElementById(enemies[e].type + (e+1)).classList.contains("fadeout")) {
+                document.getElementById(enemies[e].type + (e+1)).classList.add("running");
+
+            if (player_left<=left_pos-48-offset[0]) {
+                enemies[e].pos-=enemies[e].speed;
+                document.getElementById(enemies[e].type + (e+1)).style.left = left_pos;
+                }
+            else if (player_left>=left_pos+48-offset[0]) {
+                enemies[e].pos+=enemies[e].speed;
+                document.getElementById(enemies[e].type + (e+1)).style.left = left_pos;
+                }
+            else {  // enemy melee attack
+                if (!document.getElementById(enemies[e].type + (e+1)).classList.contains("attacking") &&
+                 !document.getElementById(enemies[e].type + (e+1)).classList.contains("attacking2")
+                 && !document.getElementById(enemies[e].type + (e+1)).classList.contains("firing")) {
+                        document.getElementById(enemies[e].type + (e+1)).classList.remove("running");
+                        document.getElementById(enemies[e].type + (e+1)).classList.add("attacking");
+                        let enemy = enemies[e].type + (e+1);
+                        let dmg = enemies[e].strength;
+                        let x = parseInt(document.getElementById("ground" + enemies[e].platform + "left").style.left)+enemies[e].pos;
+                        enemy_attack_timer = setTimeout(function() {enemy_melee(enemy, x, dmg)}, 1000);
+                    }
+                }
+            } //enemy ranged attack
+        } if (document.getElementById(enemies[e].type + (e+1)).classList.contains("running") && !document.getElementById(enemies[e].type + (e+1)).classList.contains("attacking")) {
+            let y_offset = 0;
+            if (enemies[e].type=="bladecrawler") {y_offset=64;}
+            if (enemies[e].type=="mortiguard") {y_offset=64;}
+            if (enemies[e].type=="zogarch") {y_offset=64;}
+            if (player_top+60>top_pos+12-offset[1]+y_offset && player_top<top_pos+32-offset[1]+y_offset) {
+                if ((player_left>left_pos-240-offset[0] && player_left<left_pos-100-offset[0] && !document.getElementById(enemies[e].type + (e+1)).classList.contains("right"))
+                || (player_left>left_pos+100-offset[0] && player_left<left_pos+240-offset[0] && document.getElementById(enemies[e].type + (e+1)).classList.contains("right")) ) {
+                    if (enemies[e].type=="zarg" && enemies[e].attack==0) {
+                        let chance = Math.random();
+                        if (chance>0.95) {
+                            document.getElementById(enemies[e].type + (e+1)).classList.add("attacking");
+                            document.getElementById(enemies[e].type + (e+1)).classList.remove("running");
+                            enemies[e].attack=1;
+                            let enemy = enemies[e].type + (e+1);
+                            let f = e;
+                            setTimeout(function() {zarg_ranged(enemy);}, 800);
+                            enemy_attack_timer = setTimeout(function() {reset_ranged(f);}, 2000);
+                        }
+                        function reset_ranged(f) {
+                            enemies[f].attack=0;
+                        }
+                    }
+                    if (enemies[e].type=="szardig" && enemies[e].attack==0) {
+                        let chance = Math.random();
+                        if (chance>0.95) {
+                            document.getElementById(enemies[e].type + (e+1)).classList.add("attacking2");
+                            document.getElementById(enemies[e].type + (e+1)).classList.remove("running");
+                            enemies[e].attack=1;
+                            let enemy = enemies[e].type + (e+1);
+                            let f = e;
+                            setTimeout(function() {szardig_ranged(enemy);}, 1000);
+                            enemy_attack_timer = setTimeout(function() {reset_ranged(f);}, 2000);
+                        }
+                        function reset_ranged(f) {
+                            enemies[f].attack=0;
+                        }
+                    }
+                    if (enemies[e].type=="mortiguard" && enemies[e].attack==0) {
+                        let chance = Math.random();
+                        if (chance>0.95) {
+                            document.getElementById(enemies[e].type + (e+1)).classList.add("firing");
+                            document.getElementById(enemies[e].type + (e+1)).classList.remove("running");
+                            enemies[e].attack=1;
+                            let enemy = enemies[e].type + (e+1);
+                            let f = e;
+                            let h = 9;
+                            mortiguard_ranged(enemy, h);
+                            enemy_attack_timer = setTimeout(function() {reset_ranged(f);}, 3000);
+                        }
+                        function reset_ranged(f) {
+                            enemies[f].attack=0
+                        }
+                    }
+                }
+            }
+        }
+        //enemy movement when not engaging player
+        if (enemies[e].active==0 && document.getElementById(enemies[e].type + (e+1)).classList.contains("running")) {
+            if (!document.getElementById(enemies[e].type + (e+1)).classList.contains("fadeout")) {
+            if (!document.getElementById(enemies[e].type + (e+1)).classList.contains("right")) {
+                if (enemies[e].pos>0) {
+                    enemies[e].pos-=enemies[e].speed;
+                    document.getElementById(enemies[e].type + (e+1)).style.left = left_pos;
+                } else {
+                    document.getElementById(enemies[e].type + (e+1)).classList.add("right");
+                }
+            } else if (document.getElementById(enemies[e].type + (e+1)).classList.contains("right")) {
+                if (enemies[e].pos<enemies[e].left_boundary) {
+                    enemies[e].pos+=enemies[e].speed;
+                    document.getElementById(enemies[e].type + (e+1)).style.left = left_pos;
+                } else {
+                    document.getElementById(enemies[e].type + (e+1)).classList.remove("right");
+                }
+            }
+            }
+        }
+        //makes enemy go idle when out of range
+        if (left_pos-offset[0]<-200 || left_pos-offset[0]>840) {
+            enemies[e].active=0;
+            document.getElementById(enemies[e].type + (e+1)).classList.remove("running");
+            }
+        }
+        //makes enemy go idle when player dies
+        if (enemies[e].active==true && health==0) {
+            enemies[e].active=0;
+            document.getElementById(enemies[e].type + (e+1)).classList.remove("running");
+        }
+        //enemy death
+        if (enemies[e].health<1 && !document.getElementById(enemies[e].type + (e+1)).classList.contains("orb")) {
+            enemies[e].health=0;
+            document.getElementById(enemies[e].type + (e+1)).classList.remove("running", "attacking", "pain");
+            enemies[e].active=0;
+            document.getElementById(enemies[e].type + (e+1)).classList.add("fadeout");
+            let enemy = enemies[e].type + (e+1);
+            setTimeout(function() {death(enemy)}, 1000);
+            }
+
+            function death(enemy) {
+                if (document.getElementById(enemy).classList.contains("zarg")) {(document.getElementById(enemy).classList.add("zarg_orb"));}
+                if (document.getElementById(enemy).classList.contains("urk")) {(document.getElementById(enemy).classList.add("urk_orb"));}
+                if (document.getElementById(enemy).classList.contains("szardig")) {(document.getElementById(enemy).classList.add("szardig_orb"));}
+                if (document.getElementById(enemy).classList.contains("bladecrawler")) {(document.getElementById(enemy).classList.add("bladecrawler_orb"));}
+                if (document.getElementById(enemy).classList.contains("mortiguard")) {(document.getElementById(enemy).classList.add("mortiguard_orb"));}
+                if (document.getElementById(enemy).classList.contains("zogarch")) {(document.getElementById(enemy).classList.add("bladecrawler_orb"));}
+                document.getElementById(enemy).classList.remove("zarg", "urk", "szardig", "bladecrawler", "mortiguard", "zogarch", "fadeout", "right");
+                document.getElementById(enemy).classList.add("orb");
+            }
+
+        //enemy collisions with player projectiles
+        var projectiles = document.getElementsByClassName("projectile");
+
+        for (b=0; b<projectiles.length; b++) {
+            let x = parseFloat(projectiles[b].style.left);
+            let y = parseFloat(projectiles[b].style.top);
+            let enemy = enemies[e].type + (e+1);
+            let y_offset = 0;
+            if (enemies[e].type=="bladecrawler") {y_offset=64;}
+            if (enemies[e].type=="mortiguard") {y_offset=64;}
+            if (enemies[e].type=="zogarch") {y_offset=64;}
+            if (y+2>top_pos+2+y_offset && y<top_pos+62+y_offset && projectiles[b].classList.contains("bullet") && enemies[e].health>0) {
+                if (x+64>left_pos && x<left_pos+64) {
+                    if (!projectiles[b].classList.contains("done")) {
+                    enemies[e].health-=11;
+                    enemies[e].active=1;
+                    projectiles[b].classList.add("done");
+                    let chance = Math.random();
+                    if (chance<0.4) {pain_anim(enemy);}
+                    }
+                }
+            }
+            if (y+22>top_pos+2+y_offset && y<top_pos+62+y_offset && projectiles[b].classList.contains("flames") && enemies[e].health>0) {
+                if (x>left_pos && x<left_pos+64) {
+                    enemies[e].health-=0.1;
+                    let chance = Math.random();
+                    if (chance<0.2 && !document.getElementById(enemies[e].type + (e+1)).classList.contains("pain")) {
+                        pain_anim(enemy);
+                    }
+                }
+            }
+            if (y+22>top_pos+2+y_offset && y<top_pos+62+y_offset && projectiles[b].classList.contains("rocket") && enemies[e].health>0) {
+                if (x>left_pos && x<left_pos+64) {
+                    enemies[e].health-=10;
+                    projectiles[b].parentNode.removeChild(projectiles[b]);
+                    create_explosion(left_pos, top_pos);
+                    let chance = Math.random;
+                    if (chance<0.2) {
+                        pain_anim(enemy);
+                        }
+                }
+            }
+
+            //projectile collisions with solids
+            for (i=0; i<solids.length; i++) {
+
+                if (y+60>solids[i].top && y<solids[i].top+solids[i].height) {
+                    if (x>solids[i].left && x<solids[i].left+32) {
+                        if (projectiles[b].classList.contains("rocket") && projectiles[b]) {create_explosion(x, y);}
+                        if (projectiles[b]) {projectiles[b].parentNode.removeChild(projectiles[b]);}
+                    }
+                }
+            }
+
+
+        }
+
+        //enemy collisions with solids
+            for (i=0; i<solids.length; i++) {
+
+            if (top_pos+60>solids[i].top && top_pos<solids[i].top+solids[i].height) {
+                if (left_pos+64>solids[i].left+32 && left_pos+32<solids[i].left+36) {
+                    if (enemies[e].active==1) {left_pos-=enemies[e].speed; enemies[e].active=0;}
+                    if (enemies[e].active==0) {document.getElementById(enemies[e].type + (e+1)).classList.remove("right");}
+                }
+                if (left_pos+64>solids[i].left+48 && left_pos+32<solids[i].left+52) {
+                    if (enemies[e].active==1) {left_pos+=enemies[e].speed; enemies[e].active=0;}
+                    if (enemies[e].active==0) {document.getElementById(enemies[e].type + (e+1)).classList.add("right");}
+                }
+            }
+        }
+
+    }
+
+    //HUD function
+    if (health<0) {health=0;
+        document.getElementById("player").classList.remove("pain");
+        document.getElementById("player").classList.add("fadeout");
+        document.getElementById("player_weapon").style.display="none";
+        document.getElementById("player_weapon").classList.remove("windup", "firing", "cooldown");
+        firing = 0;
+        attacking=-1;
+        player.classList.remove("running");
+        if (document.getElementById("helmet")) {
+        window.helmet="none";
+        document.getElementById("helmet").parentNode.removeChild(document.getElementById("helmet"));}
+    }
+    if (health>=100) {health=100;}
+    document.getElementById("health_bar").style.width=(health/100)*134+"px";
+    document.getElementById("health_bar_end").style.left=(health/100)*134+3+"px";
+    if (health==0) {
+        document.getElementById("health_bar").style.visibility="hidden";
+        document.getElementById("health_bar_end").style.visibility="hidden";
+    } else {
+        document.getElementById("health_bar").style.visibility="visible";
+        document.getElementById("health_bar_end").style.visibility="visible";
+    }
+    if (player_top+offset[1]>1000) {health-=2;}
+    
+    document.getElementById("medikits").innerHTML=ammo[6];
+    document.getElementById("bullets").innerHTML=ammo[0];
+    document.getElementById("shells").innerHTML=ammo[1];
+    document.getElementById("fuel").innerHTML=ammo[2];
+    document.getElementById("charges").innerHTML=ammo[3];
+    document.getElementById("rounds").innerHTML=ammo[4];
+    document.getElementById("rockets").innerHTML=ammo[5];
+    document.getElementById("credits").innerHTML=ammo[7];
+    if (ammo[6]==0) {document.getElementById("medikits").style.color="red";} else {document.getElementById("medikits").style.color="yellow";}
+    if (ammo[0]==0) {document.getElementById("bullets").style.color="red";} else {document.getElementById("bullets").style.color="yellow";}
+    if (ammo[1]==0) {document.getElementById("shells").style.color="red";} else {document.getElementById("shells").style.color="yellow";}
+    if (ammo[2]==0) {document.getElementById("fuel").style.color="red";} else {document.getElementById("fuel").style.color="yellow";}
+    if (ammo[3]==0) {document.getElementById("charges").style.color="red";} else {document.getElementById("charges").style.color="yellow";}
+    if (ammo[4]==0) {document.getElementById("rounds").style.color="red";} else {document.getElementById("rounds").style.color="yellow";}
+    if (ammo[5]==0) {document.getElementById("rockets").style.color="red";} else {document.getElementById("rockets").style.color="yellow";}
+
+    document.getElementById("player_weapon").style.top=player_top+20;
+        if (!document.getElementById("player").classList.contains("left")) {
+            document.getElementById("player_weapon").style.left=player_left+28;
+        } else {
+            document.getElementById("player_weapon").style.left=player_left;
+        }
+
+        for (f=0; f<projectiles.length; f++) {
+            left_pos = parseFloat(projectiles[f].style.left);
+
+            speed = 1;
+            if (projectiles[f].classList.contains("bullet")) {speed = 4;}
+            if (projectiles[f].classList.contains("pellet" || "pellet2" || "pellet3")) {speed = 0;}
+            if (projectiles[f].classList.contains("flames")) {speed = 0.6;}
+            if (projectiles[f].classList.contains("laser")) {speed = 0;}
+            if (projectiles[f].classList.contains("rocket")) {speed = 1.5;}
+            if (projectiles[f].classList.contains("right")) {projectiles[f].style.left=left_pos+speed + "px";}
+            if (projectiles[f].classList.contains("left")) {projectiles[f].style.left=left_pos-speed + "px";}
+
+            if (!projectiles[f].classList.contains("bullet")) {projectiles[f].style.opacity-=0.02;}
+            if (projectiles[f].classList.contains("bullet")) {projectiles[f].style.opacity-=0.005;}
+
+            if (projectiles[f].style.opacity<0) {
+                projectiles[f].parentNode.removeChild(projectiles[f]);
+            }
+        }
+
+    //enemy projectiles collision with player
+    const fireballs = Array.from(document.getElementsByClassName("fireball"))
+     ,flamecrawls = Array.from(document.getElementsByClassName("flamecrawl"))
+     ,enemy_projectiles = Array.from(new Set(fireballs.concat(flamecrawls)));
+
+    for (ep=0; ep<enemy_projectiles.length; ep++) {
+        let x = parseInt(enemy_projectiles[ep].style.left);
+        let y = parseInt(enemy_projectiles[ep].style.top);
+
+        enemy_projectiles[ep].style.top= enemy_projectiles[ep].style.top - offset[1] + 12 + "px";
+
+        if (y>player_top+offset[1] && y<player_top+offset[1]+54 && !enemy_projectiles[ep].classList.contains("done")) {
+            if (x>player_left+offset[0] && x<player_left+offset[0]+64) {
+                if (enemy_projectiles[ep].classList.contains("fireball")) {health-=18;}
+                if (enemy_projectiles[ep].classList.contains("flamecrawl")) {health-=22;}
+                document.getElementById("player").classList.add("pain");
+                document.getElementById("player_weapon").classList.remove("firing", "windup", "cooldown");
+                document.getElementById("player_weapon").style.display="none";
+                firing=0;
+                setTimeout(end_attack, 400);
+                enemy_projectiles[ep].classList.add("done")
+                enemy_projectiles[ep].parentNode.removeChild(enemy_projectiles[ep]);
+            }
+        }
+
+        //enemy projectile collision with solids
+            for (i=0; i<solids.length; i++) {
+
+            if (y+60>solids[i].top && y<solids[i].top+solids[i].height) {
+                if (x>solids[i].left && x<solids[i].left+32) {
+                    if (enemy_projectiles[ep]) {enemy_projectiles[ep].parentNode.removeChild(enemy_projectiles[ep]);}
+                }
+            }
+
+        /*
+        //destroy szardig projectile at end of platform
+        for (i=0; i<platforms.length; i++) {
+            if (x>platforms[i].left-64 && x<platforms[i].left+((textures[i].length-2)*64)) {
+            } else {
+                enemy_projectiles[ep].parentNode.removeChild(enemy_projectiles[ep]);
+            }
+        }
+        */
+
+    }
+
+    }
+
+
+    //Boss HP Gauge
+    if (window.level==4 && platform==11) {
+        document.getElementById("boss_bar_border").style.visibility="visible";
+        document.getElementById("boss_bar_back").style.visibility="visible";
+        document.getElementById("boss_bar").style.width=(enemies[5].health/700)*134+"px";
+        document.getElementById("boss_bar_end").style.left=(enemies[5].health/700)*134+3+"px";
+        if (enemies[5].health<1) {
+            document.getElementById("boss_bar_border").style.visibility="hidden";
+            document.getElementById("boss_bar_back").style.visibility="hidden";
+            document.getElementById("boss_bar").style.visibility="hidden";
+            document.getElementById("boss_bar_end").style.visibility="hidden";
+            document.getElementById("ground15left").style.display="block";
+            document.getElementById("ground15right").style.display="block";
+            platforms[14].height="900";
+        } else {
+            document.getElementById("boss_bar").style.visibility="visible";
+            document.getElementById("boss_bar_end").style.visibility="visible";
+            document.getElementById("ground15left").style.display="none";
+            document.getElementById("ground15right").style.display="none";
+            platforms[14].height="1300";
+        }
+    }
+    if (window.level==8 && platform==7) {
+        document.getElementById("boss_bar_border").style.visibility="visible";
+        document.getElementById("boss_bar_back").style.visibility="visible";
+        document.getElementById("boss_bar").style.width=(enemies[4].health/900)*134+"px";
+        document.getElementById("boss_bar_end").style.left=(enemies[4].health/900)*134+3+"px";
+        if (enemies[4].health<1) {
+            document.getElementById("boss_bar_border").style.visibility="hidden";
+            document.getElementById("boss_bar_back").style.visibility="hidden";
+            document.getElementById("boss_bar").style.visibility="hidden";
+            document.getElementById("boss_bar_end").style.visibility="hidden";
+        } else {
+            document.getElementById("boss_bar").style.visibility="visible";
+            document.getElementById("boss_bar_end").style.visibility="visible";
+        }
+    }
+    if (window.level==14 && platform==3) {
+        document.getElementById("boss_bar_border").style.visibility="visible";
+        document.getElementById("boss_bar_back").style.visibility="visible";
+        document.getElementById("boss_bar").style.width=(enemies[0].health/1200)*134+"px";
+        document.getElementById("boss_bar_end").style.left=(enemies[0].health/1200)*134+3+"px";
+        if (enemies[0].health<1) {
+            document.getElementById("boss_bar_border").style.visibility="hidden";
+            document.getElementById("boss_bar_back").style.visibility="hidden";
+            document.getElementById("boss_bar").style.visibility="hidden";
+            document.getElementById("boss_bar_end").style.visibility="hidden";
+        } else {
+            document.getElementById("boss_bar").style.visibility="visible";
+            document.getElementById("boss_bar_end").style.visibility="visible";
+        }
+    }
+
+    //player picking up items
+    var items = document.getElementsByClassName("pickup");
+
+    for (p=0; p<pickups.length; p++) {
+        items[p].style.left = pickups[p].x + "px";
+        if (player_top+64>parseInt(items[p].style.top)-offset[1] && player_top-64<parseInt(items[p].style.top+64)-offset[1] && items[p].style.display!="none") {
+            if (player_left+48>parseInt(items[p].style.left)-offset[0] && player_left<parseInt(items[p].style.left+64)-offset[0]) {
+                items[p].style.display="none";
+                if (items[p].classList.contains("rifle")) {weapons[0]=1; weapon=1; ammo[0]+=30; set_weapon(); document.getElementById("inv_rifle").style.display="inline-block";}
+                if (items[p].classList.contains("shotgun")) {weapons[1]=1; weapon=2; ammo[1]+=8; set_weapon(); document.getElementById("inv_shotgun").style.display="inline-block";}
+                if (items[p].classList.contains("flamethrower")) {weapons[2]=1; weapon=3; ammo[2]+=50; set_weapon(); document.getElementById("inv_flamethrower").style.display="inline-block";}
+                if (items[p].classList.contains("laserlancer")) {weapons[3]=1; weapon=4; ammo[3]+=4; set_weapon(); document.getElementById("inv_laserlancer").style.display="inline-block";}
+                if (items[p].classList.contains("chaingun")) {weapons[4]=1; weapon=5; ammo[4]+=60; set_weapon(); document.getElementById("inv_chaingun").style.display="inline-block";}
+                if (items[p].classList.contains("rocketlauncher")) {weapons[5]=1; weapon=6; ammo[5]+=3; set_weapon(); document.getElementById("inv_rocketlauncher").style.display="inline-block";}
+                if (items[p].classList.contains("ammo")) {
+
+                        function give_ammo() {
+                        let selected = Math.floor(Math.random()*6);
+                        
+                        if (weapons[selected]==1 && selected==0) {ammo[selected]+=60;}
+                        else if (weapons[selected]==1 && selected==1) {ammo[selected]+=8;}
+                        else if (weapons[selected]==1 && selected==2) {ammo[selected]+=50;}
+                        else if (weapons[selected]==1 && selected==3) {ammo[selected]+=4;}
+                        else if (weapons[selected]==1 && selected==4) {ammo[selected]+=30;}
+                        else if (weapons[selected]==1 && selected==5) {ammo[selected]+=2;}
+                        else (give_ammo());
+                        }
+                        give_ammo();
+                    }
+                if (items[p].classList.contains("medikit")) {
+                    document.getElementById("inv_medikit").style.display="inline-block";
+                    ammo[6]+=1;
+                    }
+                if (items[p].classList.contains("rebreather")) {
+                    weapons[6]=1;
+                    }
+                if (items[p].classList.contains("jumpboots")) {
+                    weapons[7]=1;
+                    }
+                if (items[p].classList.contains("powersource")) {
+                    weapons[8]=1;
+                    }
+                if (items[p].classList.contains("next")) {
+                    window.level = Math.floor(window.level);
+                    window.level+=1;
+                    document.getElementById("level").parentNode.removeChild(document.getElementById("level"));
+                    clearTimeout(time);
+                    time = 0;
+                    let newlevel = document.createElement("div");
+                    newlevel.id = "level";
+                    document.getElementById("game_field").appendChild(newlevel);
+                    start_game();
+                    }
+                else if (items[p].classList.contains("previous")) {
+                    window.level = Math.floor(window.level);
+                    window.level-=0.5;
+                    document.getElementById("level").parentNode.removeChild(document.getElementById("level"));
+                    clearTimeout(time);
+                    time = 0;
+                    let newlevel = document.createElement("div");
+                    newlevel.id = "level";
+                    document.getElementById("game_field").appendChild(newlevel);
+                    start_game();
+                    }
+            }
+        }
+    }
+
+    //pickup orb to receive credits
+    let orbs = document.getElementsByClassName("orb");
+
+    for (p=0; p<orbs.length; p++) {
+        orbs[p].style.left = orbs[p].x + "px";
+        if (player_top+64>parseInt(orbs[p].style.top)-offset[1] && player_top-64<parseInt(orbs[p].style.top+64)-offset[1] && orbs[p].style.display!="none") {
+            if (player_left+48>parseInt(orbs[p].style.left)-offset[0] && player_left<parseInt(orbs[p].style.left+64)-offset[0]) {
+                orbs[p].style.display="none";
+                    if (orbs[p].classList.contains("zarg_orb")) {ammo[7]+=9;}
+                    if (orbs[p].classList.contains("urk_orb")) {ammo[7]+=11;}
+                    if (orbs[p].classList.contains("szardig_orb")) {ammo[7]+=14;}
+                    if (orbs[p].classList.contains("bladecrawler_orb")) {ammo[7]+=200;}
+                    if (orbs[p].classList.contains("mortiguard_orb")) {ammo[7]+=300;}
+                    if (orbs[p].classList.contains("zogarch_orb")) {ammo[7]+=500;}
+            }
+        }
+    }
+
+    //retrieve credits by picking up helmet
+    let helmet = document.getElementById("helmet");
+    if (helmet) {
+        if (player_top+64>parseInt(helmet.style.top)-offset[1] && player_top-64<parseInt(helmet.style.top+64)-offset[1] && helmet.style.display!="none" && health>0) {
+            if (player_left+48>parseInt(helmet.style.left)-offset[0] && player_left<parseInt(helmet.style.left+64)-offset[0]) {
+                helmet.style.display="none";
+                window.helmet="none";
+                ammo[7]+=window.c;
+            }
+        }
+    }
+
+    //stops chaingun from jamming
+    if (weapon==5 && firing==4 && !document.getElementById("player_weapon").classList.contains("firing")) {
+        firing=0;
+    }
+
+    //prompts for pressing x
+    document.getElementById("door_prompt").style.display="none";
+    document.getElementById("elevator_prompt").style.display="none";
+    document.getElementById("vendor_prompt").style.display="none";
+
+        let solid_objects = document.getElementsByClassName("solid");
+for (d=0; d<solids.length; d++) {
+    let x = parseInt(solid_objects[d].style.left);
+    let y = parseInt(solid_objects[d].style.top);   
+
+    if (player_top>y-offset[1]-32 && player_top<y-offset[1]+96 && solid_objects[d].classList.contains("door")) {
+        if (player_left>x-offset[0]-64 && player_left<x-offset[0]+64 && solid_objects[d].classList.contains("door")) {
+
+            document.getElementById("door_prompt").style.display="block";
+        }
+    }
+}
+
+
+    if (platforms[platform].tex=="elevator") {
+
+            
+            document.getElementById("elevator_prompt").style.display="block";
+        }
+
+
+    let vendor = document.getElementsByClassName("machine2");
+
+for (d=0; d<vendor.length; d++) {
+    let x = parseInt(vendor[d].style.left);
+    let y = parseInt(vendor[d].style.top);   
+
+    if (player_top>y-offset[1]-32 && player_top<y-offset[1]+96) {
+        if (player_left>x-offset[0]-64 && player_left<x-offset[0]+64) {
+
+            document.getElementById("door_prompt").style.display="none";
+            document.getElementById("vendor_prompt").style.display="block";
+
+            if (document.getElementById("store").style.display=="block") {
+                document.getElementById("vendor_prompt").style.display="none";
+            }
+        }
+    }
+    }
+
+}
+
+
+function set_weapon() {
+    if (weapon==0 || attacking>0) {
+            document.getElementById("player_weapon").style.display="none";
+            document.getElementById("player").classList.remove("weapon");
+        } else {
+            document.getElementById("player_weapon").style.display="block";
+            document.getElementById("player").classList.add("weapon");
+        }
+        if (weapon==1) {
+            document.getElementById("player_weapon").classList.remove("shotgun", "flamethrower", "laserlancer", "chaingun", "rocketlauncher");
+            document.getElementById("player_weapon").classList.add("rifle");
+        }
+        if (weapon==2) {
+            document.getElementById("player_weapon").classList.remove("rifle", "flamethrower", "laserlancer", "chaingun", "rocketlauncher");
+            document.getElementById("player_weapon").classList.add("shotgun");
+        }
+        if (weapon==3) {
+            document.getElementById("player_weapon").classList.remove("rifle", "shotgun", "laserlancer", "chaingun", "rocketlauncher");
+            document.getElementById("player_weapon").classList.add("flamethrower");
+        }
+        if (weapon==4) {
+            document.getElementById("player_weapon").classList.remove("rifle", "shotgun", "flamethrower", "chaingun", "rocketlauncher");
+            document.getElementById("player_weapon").classList.add("laserlancer");
+        }
+        if (weapon==5) {
+            document.getElementById("player_weapon").classList.remove("rifle", "shotgun", "flamethrower", "laserlancer", "rocketlauncher");
+            document.getElementById("player_weapon").classList.add("chaingun");
+        }
+        if (weapon==6) {
+            document.getElementById("player_weapon").classList.remove("rifle", "shotgun", "flamethrower", "laserlancer", "rocketlauncher");
+            document.getElementById("player_weapon").classList.add("rocketlauncher");
+        }
+}
+function test_collision() {
+    collision=false;
+    for (i=0; i<platforms.length; i++) {
+        //offset[0] is taken from platform positions
+        textures[i] = platforms[i].tex.split(", ");
+            for (t=0; t<textures[i].length; t++) {
+                let left_collision=0;
+                let right_collision=0;
+                if (textures[i][0]=="earth-left" || textures[i][0]=="grass-left") {left_collision="32";}
+                if (textures[i][0]=="stone-left" || textures[i][0]=="stone-left") {left_collision="32";}
+                if (textures[i][0]=="metal-left" || textures[i][0]=="stripes-left") {left_collision="16";}
+                if (textures[platform][textures[platform].length-1]=="earth-right") {right_collision="32";}
+                if (textures[platform][textures[platform].length-1]=="grass-right") {right_collision="32";}
+                if (textures[platform][textures[platform].length-1]=="stone-right") {right_collision="32";}
+                if (textures[platform][textures[platform].length-1]=="metal-right") {right_collision="16";}
+                if (textures[platform][textures[platform].length-1]=="stripes-right") {right_collision="16";}
+                if (textures[i][0]=="elevator" || textures[i][0]=="elevator") {left_collision="32"; right_collision="64";}
+            if (player_left>platforms[i].left-offset[0]-64-left_collision && player_left-right_collision<platforms[i].left+((textures[i].length-2)*64)-offset[0]) {
+                if (player_top>platforms[i].height-offset[1]-60 && player_top<platforms[i].height-offset[1]-54 && collision==false && jumping<0) {
+                collision = true;
+                window.double=0;
+                platform = i;
+                jumping=0;
+                player.classList.remove("falling");
+                player_top = platforms[i].height-offset[1]-58;
+                player.style.top = player_top + "px";
+                }
+            }
+        }
+    }
+}
+
+function attack_function() {
+    if (document.getElementById("player").classList.contains("attack_ready") && attacking==1) {
+        document.getElementById("player").classList.remove("attack_ready");
+        document.getElementById("player").classList.add("attack1");
+        attack_timer = setTimeout(attack_function, 400);
+    } else if (attacking==1 || attacking==3) {
+        document.getElementById("player").classList.remove("attack1", "attack2");
+        document.getElementById("player").classList.add("attack_end");
+        melee_damage(false);
+        attack_timer = setTimeout(attack_function, 400);
+        attacking=5;
+    } else if  (document.getElementById("player").classList.contains("attack1") && attacking==2) {
+        document.getElementById("player").classList.remove("attack1");
+        document.getElementById("player").classList.add("attack2");
+        melee_damage(false);
+        attacking=3;
+        attack_timer = setTimeout(attack_function, 400);
+    } else if (document.getElementById("player").classList.contains("attack2") && attacking==4) {
+        document.getElementById("player").classList.remove("attack2");
+        document.getElementById("player").classList.add("attack1");
+        melee_damage(true);
+        attacking=1;
+        attack_timer = setTimeout(attack_function, 400);
+    } else if (document.getElementById("player").classList.contains("attack_end") && attacking==5) {
+        document.getElementById("player").classList.remove("attack_end");
+        if (weapon>0) {document.getElementById("player_weapon").style.display="block";}
+        attacking=0;
+    }
+}
+
+function melee_damage(stagger) {
+    for (e=0; e<enemies.length; e++) {
+        let x = parseInt(document.getElementById("ground" + enemies[e].platform + "left").style.left)+enemies[e].pos;
+        if (x-offset[0]<player_left && x-offset[0]>player_left-48 && document.getElementById("player").classList.contains("left") && platform==enemies[e].platform-1) {
+            enemies[e].health-=15;
+            enemies[e].active=true;
+            if (stagger==true) {
+                let enemy = enemies[e].type + (e+1);
+                pain_anim(enemy);
+                }
+        }
+        if (x-offset[0]>player_left && x-offset[0]<player_left+48 && !document.getElementById("player").classList.contains("left")) {
+            enemies[e].health-=15;
+            enemies[e].active=true;
+            if (stagger==true) {
+                let enemy = enemies[e].type + (e+1);
+                pain_anim(enemy);
+                }
+        }
+    }
+}
+
+function firing_function() {
+    if (document.getElementById("player").classList.contains("left")) {dir = "left";} else {dir = "right";}
+    if (firing==2) {
+        document.getElementById("player_weapon").classList.remove("firing", "cooldown");
+        if (weapon==4 && ammo[3]>0 && !document.getElementById("player").classList.contains("pain")) {create_projectile("laser", dir); laserlancer_damage(); ammo[3]-=1;}
+        firing=0;
+    } if (firing==1 && !document.getElementById("player").classList.contains("pain")) {
+        if (weapon==1 && ammo[0]>0) {attack_timer = setTimeout(firing_function, 200); create_projectile("bullet", dir); ammo[0]-=1;}
+        if (weapon==2 && ammo[1]>0) {attack_timer = setTimeout(firing_function, 800); create_projectile("pellet", dir);
+            create_projectile("pellet2", dir); create_projectile("pellet3", dir); shotgun_damage();  ammo[1]-=1;}
+        if (weapon==3 && ammo[2]>0) {attack_timer = setTimeout(firing_function, 100); create_projectile("flames", dir); ammo[2]-=1;}
+        if (weapon==4 && ammo[3]>0) {attack_timer = setTimeout(firing_function, 1200); create_projectile("laser", dir); laserlancer_damage(); ammo[3]-=1;}
+        if (weapon==6 && ammo[5]>0) {attack_timer = setTimeout(firing_function, 800); create_projectile("rocket", dir); ammo[5]-=1;}
+        if (weapon==5 && ammo[4]>0) {attack_timer = setTimeout(firing_function, 150); create_projectile("bullet", dir); ammo[4]-=1;
+            document.getElementById("player_weapon").classList.remove("windup");
+            document.getElementById("player_weapon").classList.add("firing");
+            firing=3;}
+            //run out of ammo
+        if (weapon==1 && ammo[0]==0) {firing=2; firing_function();}
+        if (weapon==2 && ammo[1]==0) {firing=2; firing_function();}
+        if (weapon==3 && ammo[2]==0) {firing=2; firing_function();}
+        if (weapon==4 && ammo[3]==0) {firing=2; firing_function();}
+        if (weapon==6 && ammo[5]==0) {firing=2; firing_function();}
+        if (weapon==5 && ammo[4]==0) {firing=4; firing_function();}
+    } else if (firing==3 && !document.getElementById("player").classList.contains("pain")) {
+        if (ammo[4]>0) {
+        attack_timer = setTimeout(firing_function, 150);
+        create_projectile("bullet", dir);
+        ammo[4]-=1;
+        } else if (ammo[4]==0) {
+            firing=4; firing_function();
+        }
+    } else if (firing==4) {
+        document.getElementById("player_weapon").classList.remove("firing", "windup");
+        document.getElementById("player_weapon").classList.add("cooldown");
+        attack_timer = setTimeout(firing_function, 1000);
+        firing=2;
+    }
+}
+
+function create_projectile(type, dir) {
+    let newProjectile = document.createElement('div');
+        newProjectile.className = "projectile" + " " + type + " " + dir;
+        newProjectile.style.top=player_top+12+offset[1];
+
+        if (dir=="left") {newProjectile.style.left = player_left + offset[0] + -22 + "px";}
+        if (dir=="right") {newProjectile.style.left = player_left + offset[0] + 50 + "px";}
+
+        if (dir=="left" && weapon==1) {newProjectile.style.left = player_left + offset[0] + -104 + "px";}
+        if (dir=="left" && weapon==5) {newProjectile.style.left = player_left + offset[0] + -110 + "px";}
+        if (type=="bullet" && weapon==1) {newProjectile.style.opacity=0.3; newProjectile.style.top=player_top+22+offset[1];}
+        if (type=="bullet" && weapon==5) {newProjectile.style.opacity=0.3; newProjectile.style.top=player_top+27+offset[1];}
+        if (type=="pellet" || type=="pellet2" || type=="pellet3") {newProjectile.style.opacity=0.8;
+            if (dir=="left") {newProjectile.style.left = player_left + offset[0] + -128 + "px";}
+            if (dir=="right") {newProjectile.style.left = player_left + offset[0] + 64 + "px";}
+        }
+        if (type=="flames") {newProjectile.style.opacity=5;}
+        if (type=="laser") {newProjectile.style.opacity=0.8; newProjectile.style.top=player_top+20+offset[1];
+            if (dir=="left") {newProjectile.style.left = player_left + offset[0] + -600 + "px";}
+            if (dir=="right") {newProjectile.style.left = player_left + offset[0] + 64 + "px";}}
+        if (type=="rocket") {newProjectile.style.opacity=10;}
+        document.getElementById("level").appendChild(newProjectile);
+}
+
+function shotgun_damage() {
+    for (e=0; e<enemies.length; e++) {
+        let x = parseInt(document.getElementById("ground" + enemies[e].platform + "left").style.left)+enemies[e].pos;
+        let y = parseInt(document.getElementById("ground" + enemies[e].platform + "left").style.top);
+        if (y-offset[1]>player_top && y-offset[1]<player_top+64) {
+            if (x-offset[0]<player_left && x-offset[0]>player_left-160 && document.getElementById("player").classList.contains("left")) {
+                let distance = ((player_left+offset[0]-x-32)/160)*100;
+                let damage = ((100-distance)/100)*75;
+                enemies[e].health-=damage;
+                enemies[e].active=true;
+                if (enemies[e].health>0) {let enemy = enemies[e].type + (e+1); pain_anim(enemy);}
+                }
+            if (x-offset[0]>player_left && x-offset[0]<player_left+160 && !document.getElementById("player").classList.contains("left")) {
+                let distance = ((x-offset[0]-player_left-32)/160)*100;
+                let damage = (((100-distance)/100)*75);
+                enemies[e].health-=damage;
+                enemies[e].active=true;
+                if (enemies[e].health>0) {let enemy = enemies[e].type + (e+1); pain_anim(enemy);}
+                }
+            }
+        }
+    }
+
+function laserlancer_damage() {
+    for (e=0; e<enemies.length; e++) {
+        let x = parseInt(document.getElementById("ground" + enemies[e].platform + "left").style.left)+enemies[e].pos;
+        let y = parseInt(document.getElementById("ground" + enemies[e].platform + "left").style.top)-64;
+        if (y-offset[1]+64>player_top+20 && y-offset[1]<player_top+32) {
+        if (x-offset[0]<player_left && x-offset[0]>player_left-500 && document.getElementById("player").classList.contains("left")) {
+            enemies[e].health-=140;
+            enemies[e].active=true;
+                if (enemies[e].health>0) {
+                    let enemy = enemies[e].type + (e+1);
+                    pain_anim(enemy);
+                    }
+            }
+        if (x-offset[0]>player_left && x-offset[0]<player_left+500 && !document.getElementById("player").classList.contains("left")) {
+            enemies[e].health-=140;
+            enemies[e].active=true;
+                if (enemies[e].health>0) {
+                    let enemy = enemies[e].type + (e+1);
+                    pain_anim(enemy);
+                    }
+                }
+            }
+        }
+    }
+
+function pain_anim(enemy) {
+        document.getElementById(enemy).classList.remove("running", "attacking");
+        document.getElementById(enemy).classList.add("pain");
+        setTimeout(function() {document.getElementById(enemy).classList.remove("pain")}, 400);
+}
+
+function enemy_melee(i, x, dmg) {
+    if (document.getElementById(i).classList.contains("attacking") && !document.getElementById(i).classList.contains("pain")) {
+        if (player_left<x-offset[0] && player_left>x-48-offset[0] && !document.getElementById(i).classList.contains("right")) {
+            health-=dmg;
+            let chance = Math.random();
+            if (chance>0.5) {
+                document.getElementById("player").classList.add("pain");
+                firing=0;
+                document.getElementById("player_weapon").classList.remove("firing");
+                document.getElementById("player_weapon").style.display="none";
+                setTimeout(end_attack, 400);
+                }
+            }
+        if (player_left>x-offset[0] && player_left<x+48-offset[0] && document.getElementById(i).classList.contains("right")) {
+            health-=dmg;
+            let chance = Math.random();
+            if (chance>0.5) {
+                document.getElementById("player").classList.add("pain");
+                firing=0;
+                document.getElementById("player_weapon").classList.remove("firing");
+                document.getElementById("player_weapon").style.display="none";
+                setTimeout(end_attack, 400);
+                }
+            }
+        document.getElementById(i).classList.remove("attacking");
+    }
+    document.getElementById(i).classList.add("running");
+}
+
+function create_explosion(x, y) {
+    let newExplosion = document.createElement('div');
+    newExplosion.className = "explosion";
+    newExplosion.style.left = (x+4) + "px";
+    newExplosion.style.top = (y+4) + "px";
+    document.getElementById("level").appendChild(newExplosion);
+
+    if (player_top+60>y && player_top<y+64) {
+        if (player_left+64+offset[0]>x-16 && player_left+offset[0]<x+72) {
+            health-=50;
+        }
+    }
+
+    let enemies = document.getElementsByClassName("enemy");
+    
+    for (e=0; e<enemies.length; e++) {
+        let left_pos = parseInt(enemies[e].style.left);
+        let top_pos = parseInt(enemies[e].style.top);
+
+    if (top_pos+60>y && top_pos<y+32) {
+        if (left_pos+64>x-16 && left_pos<x+72) {
+            window.enemies[e].health-=50;
+        }
+    }
+    }
+
+    setTimeout(destroy_explosion, 500);
+
+    function destroy_explosion() {
+        newExplosion.parentNode.removeChild(newExplosion);
+    }
+}
+
+function zarg_ranged(i) {
+        let x = parseInt(document.getElementById(i).style.left);
+        let y = parseInt(document.getElementById(i).style.top);
+        if (!document.getElementById(i).classList.contains("right")) {dir="left";}
+        if (document.getElementById(i).classList.contains("right")) {dir="right";}
+        let newProjectile = document.createElement('div');
+        newProjectile.className = "projectile" + " " + "fireball" + " " + dir;
+        newProjectile.style.top=y+12;
+        speed = 1;
+        if (dir=="left") {newProjectile.style.left = x + -22 + "px";}
+        if (dir=="right") {newProjectile.style.left = x + 50 + "px";}
+
+        newProjectile.style.opacity=5;
+
+        document.getElementById("level").appendChild(newProjectile);
+
+    document.getElementById(i).classList.remove("attacking");
+    document.getElementById(i).classList.add("running");
+}
+
+function szardig_ranged(i) {
+        let x = parseInt(document.getElementById(i).style.left);
+        let y = parseInt(document.getElementById(i).style.top);
+        if (!document.getElementById(i).classList.contains("right")) {dir="left";}
+        if (document.getElementById(i).classList.contains("right")) {dir="right";}
+        let newProjectile = document.createElement('div');
+        newProjectile.className = "projectile" + " " + "flamecrawl" + " " + dir;
+        newProjectile.style.top=y+28;
+        speed = 0.8;
+        if (dir=="left") {newProjectile.style.left = x + -22 + "px";}
+        if (dir=="right") {newProjectile.style.left = x + 50 + "px";}
+
+        newProjectile.style.opacity=5;
+
+        document.getElementById("level").appendChild(newProjectile);
+
+    document.getElementById(i).classList.remove("attacking2");
+    document.getElementById(i).classList.add("running");
+}
+
+function mortiguard_ranged(i, h) {
+        let x = parseInt(document.getElementById(i).style.left);
+        let y = parseInt(document.getElementById(i).style.top);
+
+        if (h>0 && document.getElementById("mortiguard5").classList.contains("firing") &&
+         !document.getElementById("mortiguard5").classList.contains("pain")) {
+            if (y>player_top+offset[1]-64 && y<player_top+offset[1]+54-64) {
+            health-=3;
+            }
+            h--;
+            setTimeout(function() {mortiguard_ranged(i, h);}, 100);
+        }
+
+        if (h<1 || document.getElementById("mortiguard5").classList.contains("pain")) {
+        if (document.getElementById("mortiguard5")) {
+            document.getElementById("mortiguard5").classList.remove("firing");
+            document.getElementById("mortiguard5").classList.add("running");
+        }
+        }
+
+}
+
+function use_potion(healing) {
+    if (healing>0) {
+        health+=4;
+        healing-=4;
+        var heal = setTimeout(function() {use_potion(healing)}, 100);
+    } if (healing<=0) {
+        clearTimeout(heal);
+        healing=0;
+    }
+}
+
+
+function end_attack() {
+    if (!document.getElementById("player").classList.contains("fadeout")) {
+    clearTimeout("attack_timer");
+    clearTimeout("attack");
+    player.classList.remove("attack_ready", "attack", "attack2", "attack_end");
+    player.classList.remove("potion", "pain");
+    if (weapon>0 && attacking==0) {document.getElementById("player_weapon").style.display="block";}
+    attacking=0;
+    firing=0;
+    }
+    }
+
+function give_all() {
+    health = 1000;
+    weapons = [1,1,1,1,1,1];
+    credits = ammo[7];
+    ammo = [120, 40, 100, 12, 120, 10, 9, credits];
+    document.getElementById("inv_medikit").style.display="inline-block";
+    document.getElementById("inv_rifle").style.display="inline-block";
+    document.getElementById("inv_shotgun").style.display="inline-block";
+    document.getElementById("inv_flamethrower").style.display="inline-block";
+    document.getElementById("inv_laserlancer").style.display="inline-block";
+    document.getElementById("inv_chaingun").style.display="inline-block";
+    document.getElementById("inv_rocketlauncher").style.display="inline-block";
+}
+
+function interact() {
+
+    //open doors
+    let solid_objects = document.getElementsByClassName("solid");
+
+    for (d=0; d<solids.length; d++) {
+        let x = parseInt(solid_objects[d].style.left);
+        let y = parseInt(solid_objects[d].style.top);   
+
+        if (player_top>y-offset[1]-32 && player_top<y-offset[1]+96 && solid_objects[d].classList.contains("door")) {
+            if (player_left>x-offset[0]-64 && player_left<x-offset[0]+256 && solid_objects[d].classList.contains("door")) {
+
+                let g = 64;
+                let door = solids[d];
+                let object = solid_objects[d];
+                if (door.open==0) {
+                setTimeout(opening, 20);
+                }
+
+                function opening() {
+                    door.top-=2;
+                    object.style.top = door.top;
+                    g-=2;
+                    if (g>0) {
+                    setTimeout(opening, 20);
+                    } else {
+                        door.open=1;
+                    }
+                }
+
+            }
+        }
+    }
+
+
+        if (platforms[platform].tex=="elevator") {
+
+            let h = 220;
+            let elevator = platforms[platform];
+            let object = document.getElementById("ground" + (platform+1) + "left");
+            if (elevator.raised==0) {
+                setTimeout(raising, 20);
+            } else if (elevator.raised==1) {
+                setTimeout(lowering, 20);
+            }
+
+            function raising() {
+                if (player_top>240) {elevator.height-=2;}
+                else if (offset[1]>0) {elevator.height-=2; offset[1]-=2;}
+                else {elevator.height-=2;}
+                object.style.top = elevator.height;
+
+                h-=2;
+                elevator.raised=0.5;
+                if (h>0) {
+                    setTimeout(raising, 20);
+                } else {
+                        elevator.raised=1;
+
+                        
+                }
+            }
+
+
+            function lowering() {
+                if (player_top<320) {elevator.height+=2;}
+                else {elevator.height+=2; offset[1]+=2;}
+                object.style.top = elevator.height;
+                h-=2;
+                elevator.raised=0.5;
+                if (h>0) {
+                    setTimeout(lowering, 20);
+                } else {
+                        elevator.raised=0;
+                }
+            }
+        }
+
+        //activate vendor
+        let vendor = document.getElementsByClassName("machine2");
+
+    for (d=0; d<vendor.length; d++) {
+        let x = parseInt(vendor[d].style.left);
+        let y = parseInt(vendor[d].style.top);   
+
+        if (player_top>y-offset[1]-32 && player_top<y-offset[1]+96) {
+            if (player_left>x-offset[0]-64 && player_left<x-offset[0]+256) {
+
+                if (window.attacking!=-2) {
+                    document.getElementById("store").style.display="block";
+                    window.attacking=-2;
+                } else if (window.attacking==-2) {
+                    document.getElementById("store").style.display="none";
+                    window.attacking=0;
+                }
+                
+            }
+        }
+    }
+}
+
+    document.getElementById("rifle").onclick = function() {buy("rifle");};
+    document.getElementById("shotgun").onclick = function() {buy("shotgun");};
+    document.getElementById("flamethrower").onclick = function() {buy("flamethrower");};
+    document.getElementById("laserlancer").onclick = function() {buy("laserlancer");};
+    document.getElementById("chaingun").onclick = function() {buy("chaingun");};
+    document.getElementById("rocketlauncher").onclick = function() {buy("rocketlauncher");};
+
+
+function buy(weapon) {
+if (weapon=="rifle" && ammo[7]>=70) {weapons[0]=1; ammo[7]-=70; ammo[0]+=50; document.getElementById("inv_rifle").style.display="inline-block";}
+if (weapon=="shotgun" && ammo[7]>=200) {weapons[1]=1; ammo[7]-=200; ammo[1]+=8; document.getElementById("inv_shotgun").style.display="inline-block";}
+if (weapon=="flamethrower" && ammo[7]>=120) {weapons[2]=1; ammo[7]-=120; ammo[2]+=50; document.getElementById("inv_flamethrower").style.display="inline-block";}
+if (weapon=="laserlancer" && ammo[7]>=500) {weapons[3]=1; ammo[7]-=500; ammo[3]+=4;  document.getElementById("inv_laserlancer").style.display="inline-block";}
+if (weapon=="chaingun" && ammo[7]>=400) {weapons[4]=1; ammo[7]-=400; ammo[4]+=30; document.getElementById("inv_chaingun").style.display="inline-block";}
+if (weapon=="rocketlauncher" && ammo[7]>=500) {weapons[5]=1; ammo[7]-=500; ammo[0]+=3; document.getElementById("inv_rocketlauncher").style.display="inline-block";}
+}
+
+function restart() {
+    let x = player_left;
+    let y = player_top;
+    window.c = ammo[7];
+    document.getElementById("level").parentNode.removeChild(document.getElementById("level"));
+    clearTimeout(time);
+    time = 0;
+
+    let newlevel = document.createElement("div");
+    newlevel.id = "level";
+    document.getElementById("game_field").appendChild(newlevel);
+
+    let helmet = document.createElement("div");
+    helmet.id = "helmet";
+    helmet.style.left = x + offset[0] + "px";
+    helmet.style.top = y + offset[1] + "px";
+
+    if (player_top+offset[1]>1000 && player_left<platforms[platform].left-offset[0]) {helmet.style.left = platforms[platform].left-32 + "px";}
+    textures = platforms[platform].tex.split(", ");
+    if (player_top+offset[1]>1000 && player_left>platforms[platform].left-offset[0]) {helmet.style.left = platforms[platform].left+(textures.length*32) + "px";}
+    if (player_top+offset[1]>1000) {helmet.style.top = platforms[platform].height - 60 + "px";}
+
+    window.helmet = [helmet.style.left, helmet.style.top, Math.floor(window.level)];
+
+    //document.getElementById("level").appendChild(helmet);
+
+    document.getElementById("boss_bar_border").style.visibility="hidden";
+    document.getElementById("boss_bar").style.visibility="hidden";
+    document.getElementById("boss_bar_end").style.visibility="hidden";
+    document.getElementById("boss_bar_back").style.visibility="hidden";  
+
+    window.level = 0;
+    window.health = 100;
+    start_game();
+    document.getElementById("player").classList.remove("fadeout");
+    player.classList.remove("attack_ready", "attack", "attack2", "attack_end");
+    player.classList.remove("potion", "pain");
+    if (weapon>0) {document.getElementById("player_weapon").style.display="block";}
+    ammo[7] = 0;
+    window.attacking = 0;
+    window.firing = 0;
+    window.charging = 0;
+    window.jumping = 0;
+}
+
+</script>
+
+
+</body></html>
